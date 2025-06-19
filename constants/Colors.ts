@@ -17,3 +17,8 @@ export default {
     tabIconSelected: tintColorDark,
   },
 };
+
+//using Seashell  Thistle Periwinkle
+// use the black and its shades for DarkTheme
+// use the purple and its shades for LightTheme
+//#f0f0f0 for light mode

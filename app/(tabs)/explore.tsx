@@ -11,11 +11,36 @@ export default function exploreScreen() {
 
       // <SafeAreaView  style={styles.container }>
       <View>
-        <SafeAreaView style={styles.row}>
-          <TextInput placeholder="Explore near you" style={{ padding: 15, position: 'relative', borderWidth: 0, borderColor: 'blue', borderRadius: 5 }} />
-          <Ionicons name="filter" size={30} color="white" style={{ backgroundColor: 'gray', position: 'absolute', right: 20, top: 5 }} />
-
-        </SafeAreaView>
+        <SafeAreaView style={{
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    margin: 15,
+  }}>
+    <TextInput
+      placeholder="Explore near you"
+      style={{
+        flex: 1,
+        padding: 10,
+        borderWidth: 0,
+        backgroundColor: 'red',
+        fontSize: 16,
+      }}
+    />
+    <Ionicons
+      name="color-filter-outline"
+      size={24}
+      color="black"
+      style={{
+        backgroundColor: 'thistle',
+        padding: 6,
+        borderRadius: 8,
+      }}
+    />
+  </SafeAreaView>
 
               <View style={styles.row}>
                 <TouchableOpacity style={styles.btn}><Text>Upcoming</Text></TouchableOpacity>
@@ -50,7 +75,7 @@ const styles = StyleSheet.create({
   },
     // Add to styles:
 btn: {
-  backgroundColor: 'gray',
+  backgroundColor: '#f0f0f0',
   padding:5,
   marginHorizontal: 5,
   borderRadius: 10,
