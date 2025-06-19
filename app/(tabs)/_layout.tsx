@@ -112,7 +112,7 @@ export default function TabLayout() {
         name="explore"         // name of the tab
         options={{
           // title: 'Explore',   //title for the tab
-          tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,   //icon for the tab
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,   //icon for the tab
           headerShown: true, // Disable the header for this tab
           // headerTitle: () => <ExploreSearchBarFunction />,
           
