@@ -1,14 +1,14 @@
 import { StyleSheet } from 'react-native';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
+import EmptyMessagesInfo from '@/components/EmptyMessages';
 import { Text, View } from '@/components/Themed';
 
-export default function TabOneScreen() {
+export default function messagesScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
+      <Text style={styles.title}>No messages at the moment</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+      <EmptyMessagesInfo path="app/(tabs)/five.tsx" />
     </View>
   );
 }

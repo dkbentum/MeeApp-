@@ -7,7 +7,7 @@ import { Text, View } from './Themed';
 
 import Colors from '@/constants/Colors';
 
-export default function EmptyExploreInfo({ path }: { path: string }) {
+export default function EmptyConnectionsInfo({ path }: { path: string }) {
   return (
     <View>
       <View style={styles.getStartedContainer}>
@@ -15,21 +15,21 @@ export default function EmptyExploreInfo({ path }: { path: string }) {
           style={styles.getStartedText}
           lightColor="rgba(0,0,0,0.8)"
           darkColor="rgba(255,255,255,0.8)">
-          Open up the code for this screen:
+          You don't have any connections yet
         </Text>
 
         <View
           style={[styles.codeHighlightContainer, styles.homeScreenFilename]}
           darkColor="rgba(255,255,255,0.05)"
           lightColor="rgba(0,0,0,0.05)">
-          <MonoText>{path}</MonoText>
+        
         </View>
 
         <Text
           style={styles.getStartedText}
           lightColor="rgba(0,0,0,0.8)"
           darkColor="rgba(255,255,255,0.8)">
-          Start conversations with people you meet and keep track of them here.
+          After connections are made they will appear here.
         </Text>
       </View>
 
