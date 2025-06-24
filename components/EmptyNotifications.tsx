@@ -15,22 +15,23 @@ export default function EmptyNotificationsInfo({ path }: { path: string }) {
           style={styles.getStartedText}
           lightColor="rgba(0,0,0,0.8)"
           darkColor="rgba(255,255,255,0.8)">
-          Open up the code for this screen:
+          No notifications yet 
         </Text>
 
         <View
           style={[styles.codeHighlightContainer, styles.homeScreenFilename]}
           darkColor="rgba(255,255,255,0.05)"
           lightColor="rgba(0,0,0,0.05)">
-          <MonoText>{path}</MonoText>
+          <Text>Start conversations with people you meet and keep track of them here in nofifications.</Text>
+          {/* <MonoText>{path}</MonoText> */}
         </View>
 
-        <Text
+        {/* <Text
           style={styles.getStartedText}
           lightColor="rgba(0,0,0,0.8)"
           darkColor="rgba(255,255,255,0.8)">
           Start conversations with people you meet and keep track of them here in nofifications.
-        </Text>
+        </Text> */}
       </View>
 
       <View style={styles.helpContainer}>
@@ -38,7 +39,7 @@ export default function EmptyNotificationsInfo({ path }: { path: string }) {
           style={styles.helpLink}
           href="https://docs.expo.io/get-started/create-a-new-app/#opening-the-app-on-your-phonetablet">
           <Text style={styles.helpLinkText} lightColor={Colors.light.tint}>
-            Tap here if your app doesn't automatically update after making changes
+            include a link
           </Text>
         </ExternalLink>
       </View>

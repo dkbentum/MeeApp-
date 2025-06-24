@@ -40,7 +40,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'CNTWK',
+          title: 'CNETWK',
           tabBarLabel: 'Home',
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
           headerTitleAlign: 'center',
@@ -68,7 +68,7 @@ export default function TabLayout() {
             </Link>
           ),
           headerLeft: () => (
-            <Link href="/modal" asChild>
+            <Link href="/rocket" asChild>
               <Pressable>
                 
                 {({ pressed }) => (
@@ -131,7 +131,7 @@ export default function TabLayout() {
           title: 'Messages',
           tabBarIcon: ({ color }) => <TabBarIcon name="envelope" color={color} />,
           headerRight: () => (
-            <Link href="/archivedMessages" asChild>
+            <Link href="/archivedMessages" asChild >
               <Pressable>
                 {({ pressed }) => (
                   <Ionicons

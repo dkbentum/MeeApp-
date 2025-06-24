@@ -10,7 +10,7 @@ export default function LoginScreen() {
           source={{ uri: 'https://img.icons8.com/color/96/000000/network.png' }}
           style={styles.logo}
         />
-        <Text style={styles.title}>CNTWK</Text>
+        <Text style={styles.title}>CNETWK</Text>
         <Text style={styles.subtitle}>Connect. Share. Grow.</Text>
       </View>
 
