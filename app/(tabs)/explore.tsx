@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 
-import EmptyExploreInfo from '@/components/EmptyExplore';
+import EmptyExploreInfo from '@/components/ExploreContent';
 import { Text, View } from '@/components/Themed';
 import ExploreHeader from '../exploreHeader';
 
@@ -24,51 +24,11 @@ export default function exploreScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+
   title: {
     fontSize: 20,
     fontWeight: 'bold',
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-    // Add to styles:
-// btn: {
-//   backgroundColor: 'thistle',
-//   padding:5,
-//   marginHorizontal: 5,
-//   borderRadius: 10,
-//   flex: 1,
-//   alignItems: 'center'
-// },
-// btns: {
-//   backgroundColor: 'red',
-//   padding:5,
-//   marginHorizontal: 10,
-//   borderRadius: 10,
-//   flex: 1,
-//   alignItems: 'center'
-// },
-// row: {
-//   flexDirection: 'row',
-//   justifyContent: 'center',
-//   marginTop: 5,
-//   marginBottom: 5,
-  
-// },
-// rows: {
-//   flexDirection: 'row',
-//   justifyContent: 'center',
-//   marginTop: 5,
-//   marginBottom: 5,
-  
-// },
 top:{
     padding: 1
 

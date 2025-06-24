@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import Entypo from '@expo/vector-icons/Entypo';
+import React, { useState } from 'react';
 import {
     ScrollView,
     StyleSheet,
@@ -9,60 +10,108 @@ import {
     View,
 } from 'react-native';
 
-const ExploreHeader = () => {
-  const timeTabs = ['Upcoming', 'Today', 'Tomorrow', 'Weekend'];
-  const categoryTabs = ['All Events', 'New groups', 'Social Activities', 'Hobbies'];
-  return (
+const timeTabs = ['Upcoming', 'Today', 'Tomorrow', 'Weekend'];
+
+const categoryTabs = [
+{ name: 'All Events', icon: 'calendar-outline' },
+{ name: 'New Groups', icon: 'people-outline' },
+{ name: 'Social', icon: 'balloon-outline' },
+{ name: 'Hobbies', icon: 'color-palette-outline' },
+{ name: 'Workshops', icon: 'construct-outline' },
+{ name: 'Tech Talks', icon: 'laptop-outline' },
+{ name: 'Games', icon: 'calendar-outline' },
+{ name: 'Music', icon: 'people-outline' },
+{ name: 'Arts', icon: 'balloon-outline' },
+{ name: 'Education', icon: 'color-palette-outline' },
+{ name: 'Writing', icon: 'construct-outline' },
+{ name: 'Career $ Business', icon: 'laptop-outline' },
+];
+
+export default function ExploreTopSection() {
+const [selectedTimeTab, setSelectedTimeTab] = useState('Upcoming');
+const [selectedCategory, setSelectedCategory] = useState('All Events');
+
+return (
     <View style={styles.container}>
-      {/* 🔍 Search bar + Filter */}
-      <View style={styles.searchContainer}>
+      {/* 🔍 Search bar */}
+    <View style={styles.searchContainer}>
         <TextInput
-          placeholder="Explore events near you"
-          placeholderTextColor="#888"
-          style={styles.input}
+        placeholder="Explore events near you"
+        placeholderTextColor="#888"
+        style={styles.input}
         />
         <TouchableOpacity style={styles.filterButton}>
-          <Ionicons name="filter" size={20} color="white" />
+        <Entypo name="dropbox" size={25} color="white" />
         </TouchableOpacity>
-      </View>
+    </View>
 
-      {/* 🟦 Time Tabs */}
+      {/* 🕒 Time Tabs */}
       <View style={styles.timeTabs}>
-        {timeTabs.map((label, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.tabButton,
-              label === 'Upcoming' && styles.activeTab,
-            ]}
-          >
-            <Text style={styles.tabText}>{label}</Text>
-          </TouchableOpacity>
-        ))}
+        {timeTabs.map((label, index) => {
+          const isSelected = selectedTimeTab === label;
+          return (
+            <TouchableOpacity
+              key={index}
+              style={[styles.timeTabButton, isSelected && styles.activeTimeTab]}
+              onPress={() => setSelectedTimeTab(label)}
+            >
+              <Text
+                style={[
+                  styles.timeTabText,
+                  isSelected && styles.activeTimeTabText,
+                ]}
+              >
+                {label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
-      {/* 🧃 Category Tabs */}
+      {/* 🎨 Category Tabs */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoryTabs}
+        contentContainerStyle={styles.categoryScroll}
       >
-        {categoryTabs.map((cat, idx) => (
-          <TouchableOpacity key={idx} style={styles.categoryButton}>
-            <Text style={styles.categoryText}>{cat}</Text>
-          </TouchableOpacity>
-        ))}
+        {categoryTabs.map((tab, index) => {
+          const isSelected = selectedCategory === tab.name;
+          return (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.categoryButton,
+                isSelected && styles.selectedCategoryButton,
+              ]}
+              onPress={() => setSelectedCategory(tab.name)}
+            >
+              <Ionicons
+                name={tab.icon}
+                size={25}
+                color={isSelected ? '#000' : '#ccc'}
+              />
+              <Text
+                style={[
+                  styles.categoryText,
+                  isSelected && styles.selectedCategoryText,
+                ]}
+              >
+                {tab.name}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#000',
-    paddingTop: 50,
-    paddingBottom: 20,
-    paddingHorizontal: 16,
+    paddingTop: 45,
+    paddingBottom: 2,
+    paddingHorizontal: 15,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -83,46 +132,49 @@ const styles = StyleSheet.create({
   timeTabs: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 16,
+    marginTop: 8,
   },
-  tabButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+  timeTabButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
     borderRadius: 10,
     backgroundColor: '#1c1c1c',
   },
-  activeTab: {
-    backgroundColor: '#008080', // Teal-ish
+  activeTimeTab: {
+    backgroundColor: '#008080',
   },
-  tabText: {
-    color: '#fff',
+  timeTabText: {
+    color: '#ccc',
     fontWeight: '600',
   },
-  categoryTabs: {
-    marginTop: 16,
+  activeTimeTabText: {
+    color: '#fff',
+  },
+  categoryScroll: {
+    marginTop: 10,
+    paddingBottom: 5,
   },
   categoryButton: {
-    marginRight: 20,
-    borderBottomWidth: 2,
-    borderBottomColor: '#fff',
-    paddingBottom: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+    backgroundColor: '#1c1c1c',
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    borderRadius: 14,
+    width: 80,
+  },
+  selectedCategoryButton: {
+    backgroundColor: '#fff',
   },
   categoryText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '500',
+    marginTop: 6,
+    fontSize: 12,
+    color: '#ccc',
+    textAlign: 'center',
+  },
+  selectedCategoryText: {
+    color: '#000',
+    fontWeight: '600',
   },
 });
-
-export default ExploreHeader;
-// This component can be imported and used in your Explore screen or wherever needed.
-
-// Usage example in Explore screen:
-// import ExploreHeader from './exploreHeader';
-// ...
-// <ScrollView>
-//   <ExploreHeader />
-//   {/* Other components */}
-// </ScrollView>
-
-// Note: Make sure to adjust the import path based on your project structure.   
