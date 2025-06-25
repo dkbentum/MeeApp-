@@ -1,25 +1,21 @@
 import { StyleSheet } from 'react-native';
 
 
-import EmptyExploreInfo from '@/components/ExploreContent';
+import ExploreContentInfo from '@/components/ExploreContent';
 import { Text, View } from '@/components/Themed';
 import ExploreHeader from '../exploreHeader';
 
 export default function exploreScreen() {
   return (
-      <View>
-
-<View>
-  <ExploreHeader />
- {/* Other components */}
-</View>
+  <View>
+    <View>
+      <ExploreHeader />               // This is the header component for the Explore screen
+    </View>
       
     <View style={styles.top}>
-      <Text style={styles.title}>Explore</Text>
-      <EmptyExploreInfo path="app/(tabs)/exploreScreen.tsx" />
+      <ExploreContentInfo path="@/components/ExploreContent" />
     </View>
-    {/* </SafeAreaView> */}
-    </View>
+  </View>
   );
 }
 

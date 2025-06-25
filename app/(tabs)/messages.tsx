@@ -1,14 +1,14 @@
 import { StyleSheet } from 'react-native';
 
-import EmptyMessagesInfo from '@/components/EmptyMessages';
-import { Text, View } from '@/components/Themed';
+import MessagesContentInfo from '@/components/MessagesContent';
+import { View } from '@/components/Themed';
 
 export default function messagesScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>No messages at the moment</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EmptyMessagesInfo path="app/(tabs)/five.tsx" />
+      
+      {/* <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" /> */}
+      <MessagesContentInfo path="app/(tabs)/five.tsx" />
     </View>
   );
 }
