@@ -1,21 +1,20 @@
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet } from 'react-native';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import HomeContentInfo from '@/components/HomeContent';
+import { View } from '@/components/Themed';
 
 export default function homeScreen() {
   return (
     <View>
-      <View style={{backgroundColor:'blue', flex:1}}>  dfghjkl</View>
+      {/* <View style={{backgroundColor:'red', flex:1}}> <Text></Text></View> */}
     <View style={styles.container}>
-      <Text style={styles.title}>Home </Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+      <HomeContentInfo />
     </View>
     </View>
   );
 }
 
+// Styles for the home screen
 const styles = StyleSheet.create({
   container: {
     flex: 1,

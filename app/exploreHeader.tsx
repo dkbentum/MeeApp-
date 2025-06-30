@@ -1,49 +1,79 @@
+
+
 import { Ionicons } from '@expo/vector-icons';
 import Entypo from '@expo/vector-icons/Entypo';
 import React, { useState } from 'react';
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  useColorScheme,
 } from 'react-native';
 
 const timeTabs = ['Upcoming', 'Today', 'Tomorrow', 'Weekend'];
 
 const categoryTabs = [
-{ name: 'All Events', icon: 'calendar-outline' },
-{ name: 'New Groups', icon: 'people-outline' },
-{ name: 'Social', icon: 'balloon-outline' },
-{ name: 'Hobbies', icon: 'color-palette-outline' },
-{ name: 'Workshops', icon: 'construct-outline' },
-{ name: 'Tech Talks', icon: 'laptop-outline' },
-{ name: 'Games', icon: 'calendar-outline' },
-{ name: 'Music', icon: 'people-outline' },
-{ name: 'Arts', icon: 'balloon-outline' },
-{ name: 'Education', icon: 'color-palette-outline' },
-{ name: 'Writing', icon: 'construct-outline' },
-{ name: 'Career $ Business', icon: 'laptop-outline' },
+  { name: 'All Events', icon: 'calendar-outline' },
+  { name: 'New Groups', icon: 'people-outline' },
+  { name: 'Social', icon: 'balloon-outline' },
+  { name: 'Hobbies', icon: 'color-palette-outline' },
+  { name: 'Workshops', icon: 'construct-outline' },
+  { name: 'Tech Talks', icon: 'laptop-outline' },
+  { name: 'Games', icon: 'calendar-outline' },
+  { name: 'Music', icon: 'people-outline' },
+  { name: 'Arts', icon: 'balloon-outline' },
+  { name: 'Education', icon: 'color-palette-outline' },
+  { name: 'Writing', icon: 'construct-outline' },
+  { name: 'Career $ Business', icon: 'laptop-outline' },
 ];
 
-export default function ExploreTopSection() {
-const [selectedTimeTab, setSelectedTimeTab] = useState('Upcoming');
-const [selectedCategory, setSelectedCategory] = useState('All Events');
+const lightTheme = {
+  background: '#fff',
+  card: '#f5f5f5',
+  text: '#000',
+  mutedText: '#555',
+  inputBg: '#eee',
+  accent: '#8000ff',
+  tabBg: '#ddd',
+  selectedCategoryBg: '#8000ff',
+  selectedCategoryText: '#fff',
+};
 
-return (
-    <View style={styles.container}>
+const darkTheme = {
+  background: '#000',
+  card: '#1c1c1c',
+  text: '#fff',
+  mutedText: '#888',
+  inputBg: '#1c1c1c',
+  accent: '#b266ff',
+  tabBg: '#1c1c1c',
+  selectedCategoryBg: '#fff',
+  selectedCategoryText: '#000',
+};
+
+export default function ExploreTopSection() {
+  const colorScheme = useColorScheme();
+  const theme = colorScheme === 'light' ? lightTheme : darkTheme;
+
+  const [selectedTimeTab, setSelectedTimeTab] = useState('Upcoming');
+  const [selectedCategory, setSelectedCategory] = useState('All Events');
+
+  return (
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* 🔍 Search bar */}
-    <View style={styles.searchContainer}>
+      <View style={[styles.searchContainer, { backgroundColor: theme.inputBg }]}>
         <TextInput
-        placeholder="Explore events near you"
-        placeholderTextColor="#888"
-        style={styles.input}
+          placeholder="Explore events near you"
+          placeholderTextColor={theme.mutedText}
+          style={[styles.input, { color: theme.text }]}
         />
         <TouchableOpacity style={styles.filterButton}>
-        <Entypo name="dropbox" size={25} color="white" />
+          <Entypo name="dropbox" size={25} color={theme.text} />
         </TouchableOpacity>
-    </View>
+      </View>
 
       {/* 🕒 Time Tabs */}
       <View style={styles.timeTabs}>
@@ -52,14 +82,19 @@ return (
           return (
             <TouchableOpacity
               key={index}
-              style={[styles.timeTabButton, isSelected && styles.activeTimeTab]}
+              style={[
+                styles.timeTabButton,
+                { backgroundColor: isSelected ? theme.accent : theme.tabBg },
+              ]}
               onPress={() => setSelectedTimeTab(label)}
             >
               <Text
-                style={[
-                  styles.timeTabText,
-                  isSelected && styles.activeTimeTabText,
-                ]}
+                style={{
+                  color: isSelected
+                    ? theme.selectedCategoryText
+                    : theme.mutedText,
+                  fontWeight: '600',
+                }}
               >
                 {label}
               </Text>
@@ -81,20 +116,33 @@ return (
               key={index}
               style={[
                 styles.categoryButton,
-                isSelected && styles.selectedCategoryButton,
+                {
+                  backgroundColor: isSelected
+                    ? theme.selectedCategoryBg
+                    : theme.card,
+                },
               ]}
               onPress={() => setSelectedCategory(tab.name)}
             >
               <Ionicons
                 name={tab.icon}
                 size={25}
-                color={isSelected ? '#000' : '#ccc'}
+                color={
+                  isSelected
+                    ? theme.selectedCategoryText
+                    : theme.mutedText
+                }
               />
               <Text
-                style={[
-                  styles.categoryText,
-                  isSelected && styles.selectedCategoryText,
-                ]}
+                style={{
+                  marginTop: 6,
+                  fontSize: 12,
+                  textAlign: 'center',
+                  color: isSelected
+                    ? theme.selectedCategoryText
+                    : theme.mutedText,
+                  fontWeight: isSelected ? '600' : 'normal',
+                }}
               >
                 {tab.name}
               </Text>
@@ -108,14 +156,12 @@ return (
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#000',
     paddingTop: 45,
     paddingBottom: 2,
     paddingHorizontal: 15,
   },
   searchContainer: {
     flexDirection: 'row',
-    backgroundColor: '#1c1c1c',
     borderRadius: 12,
     alignItems: 'center',
     paddingHorizontal: 12,
@@ -123,7 +169,6 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: '#fff',
     fontSize: 16,
   },
   filterButton: {
@@ -138,17 +183,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 10,
-    backgroundColor: '#1c1c1c',
-  },
-  activeTimeTab: {
-    backgroundColor: '#008080',
-  },
-  timeTabText: {
-    color: '#ccc',
-    fontWeight: '600',
-  },
-  activeTimeTabText: {
-    color: '#fff',
   },
   categoryScroll: {
     marginTop: 10,
@@ -158,23 +192,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
-    backgroundColor: '#1c1c1c',
     paddingVertical: 10,
     paddingHorizontal: 5,
     borderRadius: 14,
     width: 80,
-  },
-  selectedCategoryButton: {
-    backgroundColor: '#fff',
-  },
-  categoryText: {
-    marginTop: 6,
-    fontSize: 12,
-    color: '#ccc',
-    textAlign: 'center',
-  },
-  selectedCategoryText: {
-    color: '#000',
-    fontWeight: '600',
   },
 });

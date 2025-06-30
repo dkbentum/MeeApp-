@@ -50,7 +50,6 @@ export default function TabLayout() {
             fontFamily: 'RockSalt-Regular', // Use the custom font
     },
 
-          // tabBarActiveTintColor: 'red',    // Change the active home-tab color to red
 
           
           headerRight: () => (
@@ -70,7 +69,6 @@ export default function TabLayout() {
           headerLeft: () => (
             <Link href="/rocket" asChild>
               <Pressable>
-                
                 {({ pressed }) => (
                   <Ionicons
                     name="rocket-outline"
@@ -78,12 +76,9 @@ export default function TabLayout() {
                     color={Colors[colorScheme ?? 'light'].text}
                     style={{ marginLeft: 20, opacity: pressed ? 0.5 : 1 }}
                   />
-                
                 )}
               </Pressable>
-              
             </Link>
-            
           ),
         }}
       />
