@@ -1,34 +1,36 @@
-import { StyleSheet } from 'react-native';
-
 import HomeContentInfo from '@/components/HomeContent';
-import { View } from '@/components/Themed';
+import { StyleSheet, Text, View } from 'react-native';
 
-export default function homeScreen() {
+// ✅ Capitalized function name — very important for React Native
+export default function HomeScreen() {
   return (
-    <View>
-      {/* <View style={{backgroundColor:'red', flex:1}}> <Text></Text></View> */}
-    <View style={styles.container}>
-      <HomeContentInfo />
-    </View>
+    <View style={styles.outerContainer}>
+      <View style={styles.container}>
+        {/* Visible title */}
+        <Text style={styles.title}>🖖 Heyy, username</Text>
+        {/* Your HomeContentInfo component */}
+        <HomeContentInfo />
+      </View>
     </View>
   );
 }
 
-// Styles for the home screen
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    backgroundColor: '#f0f0f0', // light gray so you can see it
+  },
   container: {
     flex: 1,
+    padding: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
+    marginBottom: 0,
+    color: '#333',
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-}
-);
+
+});
