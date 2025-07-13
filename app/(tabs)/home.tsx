@@ -1,5 +1,5 @@
 import HomeContentInfo from '@/components/HomeContent';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 // ✅ Capitalized function name — very important for React Native
 export default function HomeScreen() {
@@ -7,7 +7,7 @@ export default function HomeScreen() {
     <View style={styles.outerContainer}>
       <View style={styles.container}>
         {/* Visible title */}
-        <Text style={styles.title}>🖖 Heyy, username</Text>
+        {/* <Text style={styles.title}>🖖 Heyy, new_user</Text> */}
         {/* Your HomeContentInfo component */}
         <HomeContentInfo />
       </View>
@@ -22,7 +22,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },

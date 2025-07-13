@@ -1,122 +1,172 @@
-// This is the main component for displaying explore content
-// This component fetches and displays a list of posts from a placeholder API.
-// You can replace the API URL with your own to fetch actual data as needed.
-// It uses React Native's FlatList to render the list of posts.
-// The component is styled using StyleSheet from React Native.
-// It also imports custom Text and View components from a themed file for consistent styling across the app.
-// The component can be used in the main Explore screen or wherever you want to display explore content.
-// You can customize it further by adding features like pull-to-refresh, pagination, etc.
-// Make sure to handle loading states and errors as needed in a production application.
-// This component can be imported and used in your main Explore screen or any other screen where you want to display explore content.
-// You can also pass additional props to customize the content or fetch different data based on the path or other parameters.
-// This is a basic implementation. You can enhance it further by adding features like pull-to-refresh, pagination, etc.
-// You can also add navigation to individual post details if needed.
-// This component is a functional component that uses React hooks for state management and side effects.
-// It fetches data from a placeholder API and displays it in a list format.
-// The component is designed to be reusable and can be easily integrated into your application.
-// This component is a functional component that uses React hooks for state management and side effects.
-// It fetches data from a placeholder API and displays it in a list format.
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  FlatList,
+  Image,
+  Platform,
+  RefreshControl,
+  StyleSheet,
+  useColorScheme,
+  View,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
+import { FontAwesome, Feather } from '@expo/vector-icons';
+import { StatusBar } from 'expo-status-bar';
+import { Text } from './Themed';
 
-import React, { useEffect, useState } from 'react'; // Import React and necessary hooks
-// Import necessary components and hooks from React Native
-// Import FlatList for rendering lists and StyleSheet for styling
-import { FlatList, StyleSheet } from 'react-native';
-// Import custom components for theming and layout
-import { Text, View } from './Themed';
+const dummyHeadlines = [
+  'AI Just Changed Everything',
+  '5 Surprising Facts About the Future of Work',
+  'What NASA Discovered on Mars This Week',
+  'Top Tech Trends You Shouldn’t Ignore',
+  'This Startup Raised $50M Overnight',
+  'Is Quantum Computing Closer Than We Think?',
+  'How Gen Z is Shaping the Workforce',
+  'The Rise of AI-Powered News Apps',
+  'Inside the Lab: Building Better Batteries',
+  'The Truth About Tech Addiction'
+];
 
-// This component fetches and displays a list of posts from a placeholder API
-export default function ExploreContentInfo({ path }: { path: string }) {
-  // Define the type for a Post object
-  // This type represents the structure of a post object fetched from the API
-  // It includes an id, title, and body
-  // You can modify this type based on the actual data structure you expect from your API
-  type Post = { id: number; title: string; body: string };
-  const [postList, setPostList] = useState<Post[]>([]);   // State to hold the list of posts
+const dummySummaries = [
+  'A quick summary of key changes you need to know about AI in 2025.',
+  'From hybrid schedules to AI co-workers, the new normal is here.',
+  'Robotic rovers find new evidence of water deep beneath the surface.',
+  'Experts reveal which trends will dominate the next decade.',
+  'The founders share their strategy behind the blitz fundraising.',
+  'Researchers claim a major breakthrough in quantum error correction.',
+  'New surveys reveal how Gen Z reshapes company cultures.',
+  'Apps like Perplexity are redefining the way we read news.',
+  'Innovators are exploring how to increase battery density by 200%.',
+  'How our digital habits are affecting mental health at scale.'
+];
 
-  // Function to fetch data from the placeholder API
-  const fetchData = async (limit = 20) => {
-    const response = await fetch(`https://jsonplaceholder.typicode.com/posts?_limit=${limit}`);
-    const data = await response.json()
-    setPostList(data)
+const { height: screenHeight } = Dimensions.get('window');
+
+type PicsumItem = {
+  id: string;
+  download_url: string;
+};
+
+export default function ExploreContentInfo() {
+  const [articles, setArticles] = useState<any[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const theme = useColorScheme();
+  const isDark = theme === 'dark';
+
+  const fetchArticles = async () => {
+    try {
+      const res = await fetch('https://picsum.photos/v2/list?page=2&limit=10');
+      const data: PicsumItem[] = await res.json();
+      const mapped = data.map((item: PicsumItem, index: number) => ({
+        id: item.id,
+        imageUrl: item.download_url,
+        headline: dummyHeadlines[index % dummyHeadlines.length],
+        summary: dummySummaries[index % dummySummaries.length],
+      }));
+      setArticles(mapped);
+    } catch (err) {
+      console.error('Error fetching articles', err);
+    }
   };
 
-  // useEffect hook to fetch data when the component mounts
   useEffect(() => {
-    fetchData();
+    fetchArticles();
   }, []);
-  
 
-  // Render the component
-  // This function returns the JSX to be rendered
-  // It uses FlatList to render the list of posts
-  // Each post is displayed with its title and body
-  // You can customize the rendering as needed
-return (
-  <View>
-      <View>
-        <FlatList
-        data={postList}
-          renderItem={({ item }) => {
-            return (
-              <View>
-                <View style={{ padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc' }}>
-                  <Text style={{ fontSize: 25, fontWeight: 'bold' }}>{item.title}</Text>
-                  <Text style={{ fontSize: 16 }}>{item.body}</Text>
-                </View>
-              </View>
-            );
-          }}
-        />
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchArticles();
+    setRefreshing(false);
+  }, []);
+
+  const renderItem = ({ item }: { item: { id: string; imageUrl: string; headline: string; summary: string } }) => (
+    <View style={[styles.card, isDark ? styles.cardDark : styles.cardLight]}>
+      <Image source={{ uri: item.imageUrl }} style={styles.image} />
+      <View style={styles.textContainer}>
+        <Text style={[styles.title, isDark && styles.titleDark]} numberOfLines={2}>{item.headline}</Text>
+        <Text style={[styles.summary, isDark && styles.summaryDark]} numberOfLines={2}>{item.summary}</Text>
+        <View style={styles.footerRow}>
+          <View style={styles.avatarRow}>
+            <Image
+              source={{ uri: `https://i.pravatar.cc/40?u=${item.id}` }}
+              style={styles.avatar}
+            />
+            <Text style={[styles.author, isDark && styles.authorDark]}>curioustheo</Text>
+          </View>
+          <View style={styles.iconRow}>
+            <TouchableOpacity>
+              <Feather name="bookmark" size={20} color={isDark ? '#E0AFFF' : '#6D0080'} />
+            </TouchableOpacity>
+            <TouchableOpacity style={{ marginLeft: 16 }}>
+              <FontAwesome name="headphones" size={20} color={isDark ? '#E0AFFF' : '#6D0080'} />
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
-  </View>
-);
+    </View>
+  );
+
+  return (
+    <View style={[styles.container, isDark && styles.containerDark]}>
+      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+      <FlatList
+        data={articles}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        pagingEnabled
+        showsVerticalScrollIndicator={false}
+        decelerationRate="fast"
+        snapToAlignment="start"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E0AFFF" />
+        }
+        snapToInterval={screenHeight}
+        getItemLayout={(_, index) => ({ length: screenHeight, offset: screenHeight * index, index })}
+      />
+    </View>
+  );
 }
 
-// Styles for the component
 const styles = StyleSheet.create({
-  getStartedContainer: {
+  container: { flex: 1, backgroundColor: '#F5E9FF' },
+  containerDark: { backgroundColor: '#2E003E' },
+  card: {
+    height: screenHeight,
+    justifyContent: 'center',
+    padding: 16,
+  },
+  cardLight: { backgroundColor: '#FFFFFF' },
+  cardDark: { backgroundColor: '#3A003A' },
+  image: { width: '100%', height: '45%', borderRadius: 12, marginBottom: 20 },
+  textContainer: { flex: 1, justifyContent: 'flex-start' },
+  title: { fontSize: 20, fontWeight: '700', color: '#4E007E', marginBottom: 8 },
+  titleDark: { color: '#E0AFFF' },
+  summary: { fontSize: 14, color: '#6D0080', marginBottom: 12 },
+  summaryDark: { color: '#B992FF' },
+  footerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginHorizontal: 50,
   },
-  homeScreenFilename: {
-    marginVertical: 7,
+  avatarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  codeHighlightContainer: {
-    borderRadius: 3,
-    paddingHorizontal: 4,
+  avatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    marginRight: 8,
   },
-  getStartedText: {
-    fontSize: 17,
-    lineHeight: 24,
-    textAlign: 'center',
+  author: {
+    fontSize: 12,
+    color: '#6D0080',
+  },
+  authorDark: {
+    color: '#B992FF',
+  },
+  iconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
-// You can add more styles here as needed
-
-// Note: The fetchData function is currently fetching posts from a placeholder API.
-// You can replace the URL with your own API endpoint to fetch actual event data.
-
-// The component currently displays a static message. You can modify it to display the fetched data as needed.
-
-// If you want to display the fetched data in a list, you can use FlatList or any other component to render the items.
-
-// Make sure to handle loading states and errors as needed in a production application.
-
-// This component can be used in your main Explore screen or wherever you want to display the explore content.
-
-// You can also pass additional props to customize the content or fetch different data based on the path or other parameters.
-
-// Remember to import this component in your main Explore screen and use it accordingly.
-
-// This is a basic implementation. You can enhance it further by adding features like pull-to-refresh, pagination, etc.
-// You can also add navigation to individual event details if needed. 
-
-
-//  <View style={styles.getStartedContainer}>
-//       <Text
-//         style={styles.getStartedText}
-//         lightColor="rgba(0,0,0,0.8)"
-//         darkColor="rgba(255,255,255,0.8)">
-//         Show all upcomingkajufhviukhughqtjnadgn  njafngin  events here in explore
-//       </Text>
-//     </View>

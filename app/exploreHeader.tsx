@@ -60,7 +60,7 @@ export default function ExploreTopSection() {
 
   const [selectedTimeTab, setSelectedTimeTab] = useState('Upcoming');
   const [selectedCategory, setSelectedCategory] = useState('All Events');
-
+  
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* 🔍 Search bar */}

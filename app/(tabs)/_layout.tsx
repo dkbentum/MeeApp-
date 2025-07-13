@@ -116,14 +116,16 @@ export default function TabLayout() {
       <Tabs.Screen
         name="notifications"
         options={{
-          title: 'Notifications',
+          title: '🔔 Notifications',
           tabBarIcon: ({ color }) => <TabBarIcon name="bell" color={color} />,
+          tabBarLabel: 'Notifications'
         }}
-      />
+/>
       <Tabs.Screen
         name="messages"
         options={{
-          title: 'Messages',
+          title: '💬 Messages',
+          tabBarLabel: 'Messages',
           tabBarIcon: ({ color }) => <TabBarIcon name="envelope" color={color} />,
           headerRight: () => (
             <Link href="/archivedMessages" asChild >

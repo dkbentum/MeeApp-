@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -10,6 +10,7 @@ import {
 const PURPLE = '#6A0DAD';
 const LIGHT_PURPLE = '#F2E8FF';
 const DARK_PURPLE = '#4B0082';
+
 const INTERESTS = [
   'AI', 'Fitness', 'Startups', 'Music', 'Gaming', 'Tech Talks',
   'Design', 'Photography', 'Spirituality', 'Health', 'Entrepreneurship', 'Networking'
@@ -18,14 +19,17 @@ const INTERESTS = [
 const RECOMMENDED_TOPICS = ['AI Events', 'UX Meetups', 'Weekend Hackathons', 'Remote Jobs', 'Local Workshops'];
 
 export default function HomeContentInfo() {
+  const [selectedTab, setSelectedTab] = useState('Suggested');
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View><Text style={styles.title}>Work Events Ahead</Text></View>
+
       {/* Tabs */}
       <View style={styles.tabRow}>
-        <Tab label="Going" />
-        <Tab label="Saved" />
-        <Tab label="Suggested" badgeCount={5} active />
+        <Tab label="Going" active={selectedTab === 'Going'} onPress={() => setSelectedTab('Going')} />
+        <Tab label="Saved" active={selectedTab === 'Saved'} onPress={() => setSelectedTab('Saved')} />
+        <Tab label="Suggested" badgeCount={5} active={selectedTab === 'Suggested'} onPress={() => setSelectedTab('Suggested')} />
       </View>
 
       {/* Suggestion Card */}
@@ -103,47 +107,51 @@ type TabProps = {
   label: string;
   active?: boolean;
   badgeCount?: number;
+  onPress?: () => void;
 };
 
-const Tab: React.FC<TabProps> = ({ label, active, badgeCount }) => (
-  <View style={[styles.tab, active && styles.activeTab]}>
-    <Text style={[styles.tabText, active && styles.activeTabText]}>
-      {label}
-    </Text>
-    {badgeCount ? (
-      <View style={styles.badge}>
-        <Text style={styles.badgeText}>{badgeCount}</Text>
-      </View>
-    ) : null}
-  </View>
+const Tab: React.FC<TabProps> = ({ label, active, badgeCount, onPress }) => (
+  <TouchableOpacity onPress={onPress}>
+    <View style={[styles.tab, active && styles.activeTab]}>
+      <Text style={[styles.tabText, active && styles.activeTabText]}>
+        {label}
+      </Text>
+      {badgeCount ? (
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>{badgeCount}</Text>
+        </View>
+      ) : null}
+    </View>
+  </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    paddingBottom: 100,
+    padding: 24,
+    paddingBottom: 120,
     backgroundColor: '#fff',
   },
   tabRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 20,
+    marginBottom: 28,
   },
   tab: {
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
     backgroundColor: '#eee',
     flexDirection: 'row',
     alignItems: 'center',
   },
   activeTab: {
     backgroundColor: LIGHT_PURPLE,
-    borderWidth: 1.5,
+    borderWidth: 2,
     borderColor: PURPLE,
   },
   tabText: {
-    fontWeight: '600',
+    fontWeight: '700',
+    fontSize: 16,
     color: '#444',
   },
   activeTabText: {
@@ -151,78 +159,80 @@ const styles = StyleSheet.create({
   },
   badge: {
     backgroundColor: PURPLE,
-    borderRadius: 12,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    marginLeft: 6,
+    borderRadius: 16,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    marginLeft: 8,
   },
   badgeText: {
     color: 'white',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: 'bold',
   },
   card: {
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
+    borderRadius: 16,
+    padding: 24,
     shadowColor: '#000',
     shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-    marginBottom: 30,
+    shadowRadius: 8,
+    elevation: 4,
+    marginBottom: 40,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '800',
     color: DARK_PURPLE,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   cardText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#333',
-    marginBottom: 15,
+    marginBottom: 20,
   },
   button: {
     backgroundColor: PURPLE,
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingVertical: 14,
+    borderRadius: 10,
     alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   section: {
-    marginBottom: 30,
+    marginBottom: 40,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 18,
+    fontWeight: '800',
     color: DARK_PURPLE,
-    marginBottom: 6,
+    marginBottom: 10,
   },
   sectionText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#666',
   },
   link: {
-    fontSize: 14,
+    fontSize: 15,
     color: PURPLE,
     marginTop: 6,
+    fontWeight: '600',
   },
   groupStart: {
     backgroundColor: LIGHT_PURPLE,
-    padding: 16,
-    borderRadius: 10,
-    marginBottom: 30,
+    padding: 20,
+    borderRadius: 14,
+    marginBottom: 40,
   },
   groupTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
     color: PURPLE,
   },
   groupText: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#555',
   },
   interestHeader: {
@@ -230,7 +240,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   horizontalScroll: {
-    marginBottom: 30,
+    marginBottom: 40,
   },
   tagWrap: {
     flexDirection: 'row',
@@ -239,34 +249,35 @@ const styles = StyleSheet.create({
   tag: {
     backgroundColor: LIGHT_PURPLE,
     borderColor: PURPLE,
-    borderWidth: 1,
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    marginRight: 8,
-    marginBottom: 8,
+    borderWidth: 1.5,
+    borderRadius: 20,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    marginRight: 10,
+    marginBottom: 10,
   },
   tagText: {
     color: PURPLE,
-    fontWeight: '600',
+    fontWeight: '700',
+    fontSize: 15,
   },
   bulletText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#444',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   bigButton: {
-    marginTop: 20,
-    marginBottom: 50,
+    marginTop: 30,
+    marginBottom: 60,
     backgroundColor: PURPLE,
-    paddingVertical: 14,
-    borderRadius: 10,
+    paddingVertical: 16,
+    borderRadius: 12,
     alignItems: 'center',
   },
   bigButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
   },
   title: {
     fontSize: 24,
