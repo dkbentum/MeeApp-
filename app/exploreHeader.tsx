@@ -125,7 +125,7 @@ export default function ExploreTopSection() {
               onPress={() => setSelectedCategory(tab.name)}
             >
               <Ionicons
-                name={tab.icon}
+                name={tab.icon as any}
                 size={25}
                 color={
                   isSelected
