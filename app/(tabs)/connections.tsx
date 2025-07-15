@@ -6,7 +6,7 @@ import { View } from '@/components/Themed';
 export default function connectionsScreen() {
   return (
     <View style={styles.container}>
-      <ConnectionsContentInfo path="app/(tabs)/EditScreenInfo.tsx" />
+      <ConnectionsContentInfo path="app/(tabs)/rocket.tsx" />
     </View>
   );
 }

@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 
-import ExploreContentInfo from '@/components/ExploreContent';
+import ExploreContentInfo from '../ExploreContent';
 import { Text, View } from '@/components/Themed';
 import ExploreHeader from '../exploreHeader';
 
@@ -9,11 +9,11 @@ export default function exploreScreen() {
   return (
   <View>
     <View>
-      <ExploreHeader />               // This is the header component for the Explore screen
+      <ExploreHeader />  // This is the header component for the Explore screen
     </View>
-      
-    <View style={styles.top}>
-      <ExploreContentInfo path="@/components/ExploreContent" />
+    
+      <View style={styles.top}>
+      <ExploreContentInfo />
     </View>
   </View>
   );
