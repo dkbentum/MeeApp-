@@ -1,29 +1,39 @@
+import { Feather, FontAwesome } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   ActivityIndicator,
-  FlatList,
   Dimensions,
+  FlatList,
   Image,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  useColorScheme,
+  View,
 } from 'react-native';
-import { FontAwesome, Feather } from '@expo/vector-icons';
+
+type Post = {
+  id: number;
+  title: string;
+  body: string;
+};
 
 const { height: screenHeight } = Dimensions.get('window');
+const cardHeight = screenHeight * 0.61; // make card slightly smaller than screen
 
-function ExploreContentInfo() {
-  const [posts, setPosts] = useState([]);
+const ExploreContentInfo = () => {
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const theme = useColorScheme();
+  const isDark = theme === 'dark';
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=10');
-      const data = await response.json();
+      const res = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=10');
+      const data = await res.json();
       setPosts(data);
-    } catch (error) {
-      console.error('Error loading posts:', error);
+    } catch (err) {
+      console.error('Failed to fetch posts:', err);
     } finally {
       setLoading(false);
     }
@@ -33,36 +43,45 @@ function ExploreContentInfo() {
     fetchPosts();
   }, []);
 
-  const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <Image
-        source={{ uri: `https://picsum.photos/id/${item.id}/600/400` }}
-        style={styles.image}
-        resizeMode="cover"
-      />
-      <View style={styles.textContent}>
-        <Text style={styles.title} numberOfLines={2}>
+  const renderItem = ({ item }: { item: Post }) => (
+    <View style={[styles.card, { backgroundColor: isDark ? '#1c1c1e' : '#f4f4f4' }]}>
+      <View style={styles.imageContainer}>
+        <Image
+          source={{ uri: `https://picsum.photos/id/${item.id}/600/400` }}
+          style={styles.image}
+        />
+        <View style={styles.iconOverlay}>
+          <TouchableOpacity>
+            <Feather name="bookmark" size={22} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity style={{ marginLeft: 16 }}>
+            <FontAwesome name="headphones" size={22} color="white" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.textContainer}>
+        <Text
+          style={[styles.title, { color: isDark ? '#fff' : '#111' }]}
+          numberOfLines={2}
+        >
           {item.title}
         </Text>
-        <Text style={styles.body} numberOfLines={2}>
+        <Text
+          style={[styles.subtitle, { color: isDark ? '#ccc' : '#333' }]}
+          numberOfLines={2}
+        >
           {item.body}
         </Text>
-        <View style={styles.footerRow}>
-          <View style={styles.avatarRow}>
-            <Image
-              source={{ uri: `https://i.pravatar.cc/40?u=${item.id}` }}
-              style={styles.avatar}
-            />
-            <Text style={styles.username}>curioustheo</Text>
-          </View>
-          <View style={styles.iconRow}>
-            <TouchableOpacity>
-              <Feather name="bookmark" size={20} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity style={{ marginLeft: 16 }}>
-              <FontAwesome name="headphones" size={20} color="white" />
-            </TouchableOpacity>
-          </View>
+
+        <View style={styles.authorRow}>
+          <Image
+            source={{ uri: `https://i.pravatar.cc/40?u=${item.id}` }}
+            style={styles.avatar}
+          />
+          <Text style={[styles.authorText, { color: isDark ? '#aaa' : '#666' }]}>
+            @dailyed
+          </Text>
         </View>
       </View>
     </View>
@@ -72,7 +91,7 @@ function ExploreContentInfo() {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color="#6D0080" />
-        <Text>Loading posts...</Text>
+        <Text style={{ marginTop: 8 }}>Loading posts...</Text>
       </View>
     );
   }
@@ -82,39 +101,55 @@ function ExploreContentInfo() {
       data={posts}
       keyExtractor={(item) => item.id.toString()}
       renderItem={renderItem}
-      pagingEnabled
-      showsVerticalScrollIndicator={false}
-      decelerationRate="fast"
+      snapToInterval={cardHeight + 20} // card height + margin
       snapToAlignment="start"
-      snapToInterval={screenHeight}
+      decelerationRate="fast"
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{
+        paddingVertical: 10,
+      }}
       getItemLayout={(_, index) => ({
-        length: screenHeight,
-        offset: screenHeight * index,
+        length: cardHeight + 20,
+        offset: (cardHeight + 20) * index,
         index,
       })}
     />
   );
-}
+};
 
 const styles = StyleSheet.create({
   card: {
-    height: screenHeight,
-    padding: 20,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    backgroundColor: '#EFE6F5',
+    height: cardHeight,
+    marginHorizontal: 16,
+    marginVertical: 10,
+    borderRadius: 24,
+    overflow: 'hidden',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+  },
+  imageContainer: {
+    width: '100%',
+    height: 300,
+    position: 'relative',
   },
   image: {
     width: '100%',
-    height: 220,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    height: '100%',
   },
-  textContent: {
-    width: '100%',
-    backgroundColor: '#258aa3ff',
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
+  iconOverlay: {
+    position: 'absolute',
+    bottom: 12,
+    right: 12,
+    flexDirection: 'row',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  textContainer: {
     padding: 16,
     flex: 1,
     justifyContent: 'space-between',
@@ -122,36 +157,25 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#fff',
-    marginBottom: 8,
+    marginBottom: 6,
   },
-  body: {
+  subtitle: {
     fontSize: 14,
-    color: '#e3cfcf',
     marginBottom: 12,
   },
-  footerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  avatarRow: {
+  authorRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 'auto',
   },
   avatar: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     marginRight: 8,
   },
-  username: {
+  authorText: {
     fontSize: 13,
-    color: '#fff',
-  },
-  iconRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   centered: {
     flex: 1,

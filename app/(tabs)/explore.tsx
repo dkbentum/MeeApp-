@@ -1,32 +1,28 @@
 import { StyleSheet } from 'react-native';
-
-
 import ExploreContentInfo from '../ExploreContent';
-import { Text, View } from '@/components/Themed';
+import { View } from '@/components/Themed'; // Assuming Themed.View handles light/dark
 import ExploreHeader from '../exploreHeader';
 
-export default function exploreScreen() {
+export default function ExploreScreen() {
   return (
-  <View>
-    <View>
-      <ExploreHeader />  // This is the header component for the Explore screen
+    <View style={styles.container}>
+      <ExploreHeader />
+
+      <View style={styles.content}>
+        <ExploreContentInfo />
+      </View>
     </View>
-    
-      <View style={styles.top}>
-      <ExploreContentInfo />
-    </View>
-  </View>
   );
 }
 
 const styles = StyleSheet.create({
-
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  container: {
+    flex: 1, // Let screen fill vertically
+    backgroundColor: 'transparent', // Let Themed.View handle colors
   },
-top:{
-    padding: 1
-
-}
+  content: {
+    flex: 1, // This makes ExploreContentInfo scroll properly
+    paddingHorizontal: 0,
+    paddingTop: 8,
+  },
 });
