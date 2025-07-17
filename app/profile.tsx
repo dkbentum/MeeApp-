@@ -3,25 +3,27 @@ import {
   View,
   Text,
   TextInput,
-  ScrollView,
   TouchableOpacity,
+  ScrollView,
   StyleSheet,
   Image,
-  Platform,
+  StatusBar,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function ProfileScreen() {
-  const [name, setName] = useState('Dandelion');
-  const [email, setEmail] = useState('dandelion@genz.com');
-  const [bio, setBio] = useState('Just a cool human doing nerdy things.');
-  const [interests, setInterests] = useState<string[]>(['Coding', 'Design', 'Music', 'Gaming']);
+const ProfileScreen: React.FC = () => {
+  const [name, setName] = useState('Dandelion Kwame Bentum');
+  const [email, setEmail] = useState('dandelion@example.com');
+  const [bio, setBio] = useState('Nerdy student at KNUST 🚀 | Building billion-dollar ideas 👨🏽‍💻 | Making chips & machines go brrr ⚡⚡');
+  const [interests, setInterests] = useState([
+    'AI', 'React Native', 'Gaming', 'Robotics', 'Space', 'Music', 'Hacking',
+  ]);
   const [newInterest, setNewInterest] = useState('');
   const [image, setImage] = useState<string | null>(null);
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
+    let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
@@ -32,146 +34,238 @@ export default function ProfileScreen() {
     }
   };
 
+  const addInterest = () => {
+    if (newInterest.trim()) {
+      setInterests([...interests, newInterest.trim()]);
+      setNewInterest('');
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={pickImage}>
-        {image ? (
-          <Image source={{ uri: image }} style={styles.profileImage} />
-        ) : (
-          <View style={styles.profilePlaceholder}>
-            <Ionicons name="camera" size={32} color="#9B30FF" />
-          </View>
-        )}
-      </TouchableOpacity>
+      <StatusBar barStyle="light-content" />
 
-      <TextInput
-        style={styles.input}
-        value={name}
-        onChangeText={setName}
-        placeholder="Name"
-        placeholderTextColor="#999"
-      />
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Email"
-        placeholderTextColor="#999"
-      />
-      <TextInput
-        style={[styles.input, styles.bioInput]}
-        value={bio}
-        onChangeText={setBio}
-        placeholder="Bio"
-        placeholderTextColor="#999"
-        multiline
-      />
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Profile</Text>
+        <Ionicons name="settings-outline" size={24} color="white" />
+      </View>
 
-      <Text style={styles.sectionTitle}>Your Interests</Text>
-      <ScrollView
-        horizontal
-        style={styles.scrollRow}
-        contentContainerStyle={styles.interestsContainer}
-        showsHorizontalScrollIndicator={false}
-      >
-        {interests.map((interest, index) => (
-          <View key={index} style={styles.interestBadge}>
-            <Text style={styles.interestText}>{interest}</Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.card}>
+
+          {/* Profile Info */}
+          <Text style={styles.label}>FULL NAME</Text>
+          <TextInput
+            style={styles.cardText}
+            value={name}
+            onChangeText={setName}
+            placeholder="Full Name"
+            placeholderTextColor="#aaa"
+          />
+
+          <Text style={styles.label}>EMAIL</Text>
+          <TextInput
+            style={styles.cardText}
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Email"
+            placeholderTextColor="#aaa"
+          />
+
+          <Text style={styles.label}>BIO</Text>
+          <TextInput
+            style={styles.bio}
+            value={bio}
+            onChangeText={setBio}
+            placeholder="Bio"
+            placeholderTextColor="#aaa"
+            multiline
+          />
+
+          {/* Interests */}
+          <Text style={styles.label}>INTERESTS</Text>
+          <View style={styles.interestsWrapper}>
+            {interests.map((item, index) => (
+              <View key={index} style={styles.interestTag}>
+                <Text style={styles.interestText}>{item}</Text>
+              </View>
+            ))}
           </View>
-        ))}
-        <TouchableOpacity
-          style={styles.addInterestButton}
-          onPress={() => {
-            if (newInterest.trim()) {
-              setInterests([...interests, newInterest]);
-              setNewInterest('');
-            }
-          }}
-        >
-          <Ionicons name="add" size={24} color="white" />
-        </TouchableOpacity>
+
+          {/* Add Interest */}
+          <View style={styles.addInterest}>
+            <TextInput
+              style={styles.input}
+              value={newInterest}
+              onChangeText={setNewInterest}
+              placeholder="Add interest"
+              placeholderTextColor="#aaa"
+            />
+            <TouchableOpacity style={styles.addBtn} onPress={addInterest}>
+              <Text style={styles.addBtnText}>+</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Follower Stats */}
+          <View style={styles.statsContainer}>
+            <View style={styles.statBox}>
+              <Text style={styles.statNumber}>2.3k</Text>
+              <Text style={styles.statLabel}>Followers</Text>
+            </View>
+            <View style={styles.statBox}>
+              <Text style={styles.statNumber}>180</Text>
+              <Text style={styles.statLabel}>Following</Text>
+            </View>
+          </View>
+
+          {/* Edit Button */}
+          <TouchableOpacity style={styles.editBtn}>
+            <Text style={styles.editBtnText}>Edit Profile</Text>
+          </TouchableOpacity>
+
+          {/* Logout */}
+          <TouchableOpacity onPress={() => console.log('Logging out...')}>
+            <Text style={styles.logout}>Log Out</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
-
-      <TextInput
-        style={styles.input}
-        value={newInterest}
-        onChangeText={setNewInterest}
-        placeholder="Add new interest"
-        placeholderTextColor="#999"
-      />
     </View>
   );
-}
+};
+
+export default ProfileScreen;
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
-    padding: 20,
-    paddingTop: Platform.OS === 'android' ? 50 : 60,
+    backgroundColor: '#6A0DAD', // Purple
+    paddingTop: 60,
+    paddingHorizontal: 20,
   },
-  profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    alignSelf: 'center',
-    marginBottom: 20,
-    borderWidth: 2,
-    borderColor: '#9B30FF',
-  },
-  profilePlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#EDE7F6',
-    justifyContent: 'center',
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    alignSelf: 'center',
+    marginBottom: 30,
+  },
+  headerTitle: {
+    color: '#fff',
+    fontSize: 30,
+    fontWeight: 'bold',
+  },
+  card: {
+    backgroundColor: '#ffffff10',
+    borderRadius: 20,
+    padding: 20,
+  },
+  label: {
+    color: '#D8B9FF',
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 10,
+  },
+  cardText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 10,
+    borderBottomColor: '#ffffff30',
+    borderBottomWidth: 1,
+    paddingBottom: 4,
+  },
+  bio: {
+    color: 'white',
+    fontSize: 16,
+    padding: 12,
+    backgroundColor: '#ffffff10',
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  interestsWrapper: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 10,
+  },
+  interestTag: {
+    backgroundColor: '#EEE0FF',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  interestText: {
+    color: '#6A0DAD',
+    fontWeight: '500',
+  },
+  addInterest: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 20,
   },
   input: {
-    backgroundColor: '#F3E8FF',
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 15,
-    color: '#333',
-  },
-  bioInput: {
-    height: 80,
-    textAlignVertical: 'top',
-  },
-  sectionTitle: {
-    fontSize: 18,
-    color: '#4B0082',
-    marginVertical: 10,
-    fontWeight: '600',
-  },
-  scrollRow: {
-    marginBottom: 10,
-  },
-  interestsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  interestBadge: {
-    backgroundColor: '#E1BEE7',
-    paddingHorizontal: 15,
+    flex: 1,
+    backgroundColor: '#ffffff15',
+    color: 'white',
     paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 10,
-    marginBottom: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    fontSize: 16,
   },
-  interestText: {
-    color: '#4B0082',
-    fontWeight: '500',
-  },
-  addInterestButton: {
+  addBtn: {
+    marginLeft: 10,
     backgroundColor: '#9B30FF',
-    borderRadius: 20,
     padding: 10,
-    justifyContent: 'center',
+    borderRadius: 10,
+  },
+  addBtnText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 20,
+  },
+  statBox: {
+    backgroundColor: '#ffffff10',
+    padding: 16,
+    borderRadius: 16,
     alignItems: 'center',
-    marginRight: 10,
-    marginBottom: 10,
+    flex: 1,
+    marginHorizontal: 4,
+  },
+  statNumber: {
+    color: 'white',
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+  statLabel: {
+    color: '#D8B9FF',
+    fontSize: 14,
+  },
+  editBtn: {
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  editBtnText: {
+    color: '#6A0DAD',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  logout: {
+    color: '#DDA0DD',
+    fontSize: 16,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginTop: 20,
+    textDecorationLine: 'underline',
   },
 });

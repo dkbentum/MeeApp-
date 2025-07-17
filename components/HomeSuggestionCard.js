@@ -11,10 +11,10 @@ const SuggestionCard = () => {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>Get suggestions for events</Text>
-      <Text style={styles.cardText}>You have 5 suggestions for upcoming events</Text>
+      <Text style={styles.cardTitle}>Find your next gig</Text>
+      <Text style={styles.cardText}>You have 5 suggestions for upcoming gigs</Text>
       <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>View suggested events</Text>
+        <Text style={styles.buttonText}>View suggested work-events</Text>
       </TouchableOpacity>
     </View>
   );

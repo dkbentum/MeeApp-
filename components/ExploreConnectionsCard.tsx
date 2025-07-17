@@ -15,7 +15,7 @@ const ExploreConnectionsCard = () => {
         ))}
       </View>
       <TouchableOpacity style={[styles.button, { backgroundColor: isDark ? '#BB86FC' : '#6A0DAD' }]}>
-        <Text style={styles.buttonText}>Explore events</Text>
+        <Text style={styles.buttonText}>SyncUp - CNETWK Live</Text>
       </TouchableOpacity>
     </View>
   );
