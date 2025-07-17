@@ -7,7 +7,7 @@ const NoConnectionsIllustration = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../assets/images/tennis_girl.jpg')}
+        source={require('../assets/images/imageD.jpg')}
         style={styles.image}
         resizeMode="contain"
       />

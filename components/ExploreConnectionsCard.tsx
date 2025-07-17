@@ -10,7 +10,7 @@ const ExploreConnectionsCard = () => {
         Meet new connections at your next event
       </Text>
       <View style={styles.avatarsRow}>
-        {[require('../assets/images/p1.jpg'), require('../assets/images/p2.jpg'), require('../assets/images/p3.jpg')].map((src, idx) => (
+        {[require('../assets/images/imageB.jpg'), require('../assets/images/imageA.jpg'), require('../assets/images/imageC.jpg')].map((src, idx) => (
           <Image key={idx} source={src} style={styles.avatar} />
         ))}
       </View>

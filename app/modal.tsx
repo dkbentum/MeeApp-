@@ -60,7 +60,7 @@ export default function PostDetailsScreen() {
 
       {/* 7. Host + Going */}
       <View style={styles.rowBetween}>
-        <Image source={require('/assets/images/adaptive-icon.png')} style={styles.hostProfile} />
+        <Image source={require('../assets/images/adaptive-icon.png')} style={styles.hostProfile} />
         <TouchableOpacity style={styles.joinButton}>
           <Text style={styles.joinText}>Join</Text>
         </TouchableOpacity>
@@ -80,7 +80,7 @@ export default function PostDetailsScreen() {
       {/* 9. Event Photos */}
       <Text style={styles.heading}>Event Photos</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <Image source={require('../assets/images/CNETWK.jpg')} style={styles.eventPhoto} />
+        <Image source={require('../assets/images/CNETWK.png')} style={styles.eventPhoto} />
         <Image source={require('../assets/images/p2.jpg')} style={styles.eventPhoto} />
         <Image source={require('../assets/images/p2.jpg')} style={styles.eventPhoto} />
       </ScrollView>

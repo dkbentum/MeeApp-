@@ -1,11 +1,34 @@
 import React from 'react';
-import { View, Text, StyleSheet, useColorScheme } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  useColorScheme,
+  Image,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const MutualSkillsCard = ({ skills }: { skills: string[] }) => {
   const isDark = useColorScheme() === 'dark';
+
   return (
     <View style={[styles.card, { backgroundColor: isDark ? '#1F1F1F' : '#f3e8ff' }]}>
-      <Text style={[styles.title, { color: isDark ? '#fff' : '#4B0082' }]}>💡 Shared Skills</Text>
+      <View style={styles.header}>
+        <Image
+          source={require('../assets/images/imagesE.png')}
+          style={styles.image}
+        />
+        <Text style={[styles.title, { color: isDark ? '#fff' : '#4B0082' }]}>
+         Shared Skills
+        </Text>
+        <Ionicons
+          name="information-circle-outline"
+          size={20}
+          color={isDark ? '#fff' : '#4B0082'}
+          style={styles.icon}
+        />
+      </View>
+
       <View style={styles.skillList}>
         {skills.map((skill, idx) => (
           <Text key={idx} style={[styles.skill, { backgroundColor: isDark ? '#333' : '#fff' }]}>
@@ -23,10 +46,23 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: 20,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  image: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    marginRight: 10,
+  },
+  icon: {
+    marginLeft: 'auto',
+  },
   title: {
     fontSize: 16,
     fontWeight: '700',
-    marginBottom: 10,
   },
   skillList: {
     flexDirection: 'row',
