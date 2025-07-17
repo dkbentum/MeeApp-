@@ -1,15 +1,26 @@
 import { StyleSheet } from 'react-native';
+import React, { useState } from 'react';
 import ExploreContentInfo from '../ExploreContent';
 import { View } from '@/components/Themed'; // Assuming Themed.View handles light/dark
 import ExploreHeader from '../exploreHeader';
 
 export default function ExploreScreen() {
+  const [selectedTimeTab, setSelectedTimeTab] = useState('Upcoming');
+  const [selectedCategory, setSelectedCategory] = useState('All Events');
+
   return (
     <View style={styles.container}>
-      <ExploreHeader />
-
+      <ExploreHeader
+        selectedTimeTab={selectedTimeTab}
+        setSelectedTimeTab={setSelectedTimeTab}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+      />
       <View style={styles.content}>
-        <ExploreContentInfo />
+        <ExploreContentInfo
+          selectedTimeTab={selectedTimeTab}
+          selectedCategory={selectedCategory}
+        />
       </View>
     </View>
   );
@@ -17,12 +28,9 @@ export default function ExploreScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // Let screen fill vertically
-    backgroundColor: 'transparent', // Let Themed.View handle colors
+    flex: 1,
   },
   content: {
-    flex: 1, // This makes ExploreContentInfo scroll properly
-    paddingHorizontal: 0,
-    paddingTop: 8,
+    flex: 1,
   },
 });

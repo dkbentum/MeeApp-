@@ -10,21 +10,32 @@ import {
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View
+  View,
+  ActivityIndicator
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const handleLogin = () => {
-    // Handle login logic
-    console.log('Logging in with:', email, password);
+  const handleLogin = async () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      router.replace('/(tabs)/home');
+    }, 800); // Simulate a short loading delay
   };
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: '#f7f6fd' }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -41,32 +52,51 @@ export default function LoginScreen() {
             <Text style={styles.subtitle}>Connect. Share. Grow.</Text>
           </View>
 
-          <View style={styles.formContainer}>
-            <Text style={styles.label}>Email Address</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="you@example.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={email}
-              onChangeText={setEmail}
-            />
+          <View style={styles.form}>
+            <View style={styles.inputWrapper}>
+              <MaterialIcons name="email" size={22} color="#6D0080" style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Email Address"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                value={email}
+                onChangeText={setEmail}
+                placeholderTextColor="#aaa"
+              />
+            </View>
 
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="••••••••"
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-            />
+            <View style={styles.inputWrapper}>
+              <Ionicons name="lock-closed" size={22} color="#6D0080" style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Password"
+                secureTextEntry={!showPassword}
+                value={password}
+                onChangeText={setPassword}
+                placeholderTextColor="#aaa"
+              />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+                <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={20} color="#aaa" />
+              </TouchableOpacity>
+            </View>
+
+            {error ? <Text style={styles.error}>{error}</Text> : null}
 
             <TouchableOpacity style={styles.forgotPasswordContainer}>
               <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-              <Text style={styles.loginButtonText}>Log In</Text>
+            <TouchableOpacity
+              style={[styles.loginButton, loading && { backgroundColor: '#b39ddb' }]}
+              onPress={handleLogin}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.loginButtonText}>Log In / Sign Up</Text>
+              )}
             </TouchableOpacity>
 
             <View style={styles.signupContainer}>
@@ -87,90 +117,110 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    backgroundColor: '#8E2DE2',
+    padding: 24,
+    backgroundColor: '#f7f6fd',
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 24,
   },
   logo: {
-    width: 350,
-    height: 190,
-    marginBottom: 12,
-  },
-  title: {
-    fontSize: 40,
-    fontWeight: '800',
-    color: '#fff',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#f8f8f8',
-    marginTop: 4,
-  },
-  formContainer: {
-    width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    width: 90,
+    height: 90,
     borderRadius: 20,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 16,
-    elevation: 5,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
     marginBottom: 8,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginBottom: 20,
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#6D0080',
+    marginBottom: 2,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#888',
+    marginBottom: 8,
+  },
+  form: {
+    width: '100%',
+    maxWidth: 400,
     backgroundColor: '#fff',
+    borderRadius: 18,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f3eafd',
+    borderRadius: 12,
+    marginBottom: 16,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#e0aaff',
+  },
+  inputIcon: {
+    marginRight: 8,
+  },
+  input: {
+    flex: 1,
+    height: 48,
+    fontSize: 16,
+    color: '#222',
+    backgroundColor: 'transparent',
+  },
+  eyeIcon: {
+    padding: 4,
+  },
+  error: {
+    color: 'red',
+    marginBottom: 10,
+    textAlign: 'center',
+    fontWeight: '600',
   },
   forgotPasswordContainer: {
-    alignItems: 'flex-end',
-    marginBottom: 20,
+    alignSelf: 'flex-end',
+    marginBottom: 18,
   },
   forgotPasswordText: {
-    color: '#5A67D8',
-    fontWeight: '600',
+    color: '#6D0080',
+    fontWeight: '500',
     fontSize: 14,
   },
   loginButton: {
-    backgroundColor: '#6B46C1',
+    backgroundColor: '#6D0080',
+    borderRadius: 12,
     paddingVertical: 14,
-    borderRadius: 16,
     alignItems: 'center',
-    shadowColor: '#6B46C1',
-    shadowOpacity: 0.5,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 8,
-    elevation: 4,
+    marginBottom: 18,
+    shadowColor: '#6D0080',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 2,
   },
   loginButtonText: {
     color: '#fff',
+    fontWeight: 'bold',
     fontSize: 18,
-    fontWeight: '700',
   },
   signupContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 20,
+    alignItems: 'center',
   },
   signupText: {
-    color: '#555',
-    marginRight: 6,
+    color: '#888',
+    fontSize: 15,
+    marginRight: 4,
   },
   signupLink: {
-    color: '#5A67D8',
-    fontWeight: '600',
+    color: '#6D0080',
+    fontWeight: 'bold',
+    fontSize: 15,
   },
 });

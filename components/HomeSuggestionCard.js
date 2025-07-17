@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { useRouter } from 'expo-router';
 
 const PURPLE = '#6A0DAD';
 const DARK_PURPLE = '#4B0082';
@@ -8,12 +9,13 @@ const SuggestionCard = () => {
   const theme = useColorScheme();
   const isDark = theme === 'dark';
   const styles = getStyles(isDark);
+  const router = useRouter();
 
   return (
     <View style={styles.card}>
       <Text style={styles.cardTitle}>Find your next gig</Text>
       <Text style={styles.cardText}>You have 5 suggestions for upcoming gigs</Text>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)/connections')}>
         <Text style={styles.buttonText}>View suggested work-events</Text>
       </TouchableOpacity>
     </View>

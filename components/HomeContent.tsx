@@ -8,6 +8,8 @@ import InterestsSection from '../components/HomeInterestsSection';
 import RecommendedTopics from '../components/HomeRecommendedTopics';
 import SuggestionCard from '../components/HomeSuggestionCard';
 import Tab from '../components/HomeTab';
+import HomeWelcomeCard from '../components/HomeWelcomeCard';
+import HomeFeaturedImage from '../components/HomeFeaturedImage';
 
 const INTERESTS = [
   'AI', 'Fitness', 'Startups', 'Music', 'Gaming', 'Tech Talks',
@@ -58,6 +60,8 @@ export default function HomeContentInfo() {
       </View>
 
       <View style={themedStyles.separator} />
+      {/* Only keep the featured image card above the ConnectButton */}
+      <HomeFeaturedImage />
       <View style={[themedStyles.sectionContainer, themedStyles.connectBackground, themedStyles.fullWidth]}>
         <ConnectButton />
       </View>

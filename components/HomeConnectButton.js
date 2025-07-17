@@ -1,14 +1,18 @@
 // ConnectButton.js
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 
 const PURPLE = '#6A0DAD';
 
-const ConnectButton = () => (
-  <TouchableOpacity style={styles.button}>
-    <Text style={styles.buttonText}>🤝 Connect & Work</Text>
-  </TouchableOpacity>
-);
+const ConnectButton = () => {
+  const router = useRouter();
+  return (
+    <TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)/explore')}>
+      <Text style={styles.buttonText}>🤝 Connect & Work</Text>
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   button: {

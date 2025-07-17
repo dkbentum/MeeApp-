@@ -54,13 +54,15 @@ const darkTheme = {
   selectedCategoryText: '#000',
 };
 
-export default function ExploreTopSection() {
+export default function ExploreTopSection({ selectedTimeTab, setSelectedTimeTab, selectedCategory, setSelectedCategory }: {
+  selectedTimeTab: string;
+  setSelectedTimeTab: (tab: string) => void;
+  selectedCategory: string;
+  setSelectedCategory: (cat: string) => void;
+}) {
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'light' ? lightTheme : darkTheme;
 
-  const [selectedTimeTab, setSelectedTimeTab] = useState('Upcoming');
-  const [selectedCategory, setSelectedCategory] = useState('All Events');
-  
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* 🔍 Search bar */}
