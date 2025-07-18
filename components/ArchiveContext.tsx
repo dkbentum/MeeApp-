@@ -8,6 +8,7 @@ type Post = {
 type ArchiveContextType = {
   archivedPosts: Post[];
   archivePost: (post: Post) => void;
+  removeFromArchive: (postId: number) => void;
 };
 
 const ArchiveContext = createContext<ArchiveContextType | undefined>(undefined);
@@ -19,8 +20,12 @@ export const ArchiveProvider = ({ children }: { children: React.ReactNode }) => 
     setArchivedPosts((prev) => [...prev, post]);
   };
 
+  const removeFromArchive = (postId: number) => {
+    setArchivedPosts((prev) => prev.filter(post => post.id !== postId));
+  };
+
   return (
-    <ArchiveContext.Provider value={{ archivedPosts, archivePost }}>
+    <ArchiveContext.Provider value={{ archivedPosts, archivePost, removeFromArchive }}>
       {children}
     </ArchiveContext.Provider>
   );

@@ -16,6 +16,8 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { useAuth } from '@/components/AuthContext';
+import NetworkDebug from '@/components/NetworkDebug';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -24,13 +26,29 @@ export default function LoginScreen() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      setError('Please enter both email and password');
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
+    setError('');
+
+    try {
+      const success = await login(email, password);
+      if (success) {
+        router.replace('/(tabs)/home');
+      } else {
+        setError('Login failed. Please check your credentials.');
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+    } finally {
       setLoading(false);
-      router.replace('/(tabs)/home');
-    }, 800); // Simulate a short loading delay
+    }
   };
 
   return (
@@ -101,15 +119,18 @@ export default function LoginScreen() {
 
             <View style={styles.signupContainer}>
               <Text style={styles.signupText}>Don't have an account?</Text>
-              <TouchableOpacity>
-                <Text style={styles.signupLink}>Sign Up</Text>
-              </TouchableOpacity>
-            </View>
+                          <TouchableOpacity>
+              <Text style={styles.signupLink}>Sign Up</Text>
+            </TouchableOpacity>
           </View>
-        </ScrollView>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
-  );
+        </View>
+
+        {/* Network Debug Component - Remove this in production */}
+        <NetworkDebug />
+      </ScrollView>
+    </TouchableWithoutFeedback>
+  </KeyboardAvoidingView>
+);
 }
 
 const styles = StyleSheet.create({
