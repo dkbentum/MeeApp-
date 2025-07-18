@@ -44,6 +44,9 @@ export default function MessagesScreen() {
         </View>
       </View>
 
+      {/* Lower header */}
+      <Text style={styles.lowerHeader}>Group messages</Text>
+
       <MessagesContentInfo path="app/(tabs)/messages.tsx" searchQuery={searchQuery} />
 
       {/* Floating Add Button */}
@@ -103,5 +106,13 @@ const getStyles = (isDark: boolean) =>
       shadowOpacity: 0.3,
       shadowOffset: { width: 0, height: 2 },
       shadowRadius: 3,
+    },
+    lowerHeader: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: isDark ? '#fff' : '#6D0080',
+      marginTop: 8,
+      marginBottom: 8,
+      marginLeft: 20,
     },
   });

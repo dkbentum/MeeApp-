@@ -1,11 +1,11 @@
+
 spring:
   application:
     name: meeapp-backend
-  
   datasource:
-    url: jdbc:postgresql://localhost:5432/meeapp_db
+    url: jdbc:postgresql://localhost:5432/meeapp
     username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:password}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
   
   jpa:
@@ -25,8 +25,8 @@ spring:
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:}
-    password: ${MAIL_PASSWORD:}
+    username: ${MAIL_USERNAME:dandelionkwamebentum1@gmail.com}
+    password: ${MAIL_PASSWORD:yjzxlsbzsszxhhwm}
     properties:
       mail:
         smtp:
@@ -49,5 +49,5 @@ app:
     secret: ${JWT_SECRET:mySecretKey}
     expiration: 86400000 # 24 hours
   
-  cors:
-    allowed-origins: ${CORS_ORIGINS:http://localhost:3000,http://localhost:8081}
+#  cors:
+#    allowed-origins: ${CORS_ORIGINS:http://localhost:3000,http://localhost:8081}

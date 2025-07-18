@@ -1,0 +1,41 @@
+### MessageController HTTP Requests
+
+# 1. Send Message
+POST http://localhost:8080/api/messages
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "content": "Hello group!",
+  "groupId": 1
+}
+
+###
+
+# 2. Get Conversations
+GET http://localhost:8080/api/messages/conversations
+Authorization: Bearer <token>
+
+###
+
+# 3. Get Conversation Messages
+GET http://localhost:8080/api/messages/conversations/1
+Authorization: Bearer <token>
+
+###
+
+# 4. Get Unread Messages
+GET http://localhost:8080/api/messages/unread
+Authorization: Bearer <token>
+
+###
+
+# 5. Get Unread Message Count
+GET http://localhost:8080/api/messages/unread/count
+Authorization: Bearer <token>
+
+###
+
+# 6. Mark Message as Read
+PUT http://localhost:8080/api/messages/1/read
+Authorization: Bearer <token> 

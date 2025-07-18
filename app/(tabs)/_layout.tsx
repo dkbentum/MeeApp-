@@ -86,7 +86,7 @@ export default function TabLayout() {
         name="connections"
         options={{
           title: 'Connections',
-          tabBarIcon: ({ color }) => <TabBarIcon name="connectdevelop" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="connectdevelop" color={color} />, 
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
@@ -101,6 +101,12 @@ export default function TabLayout() {
               </Pressable>
             </Link>
           ),
+          headerTitleAlign: 'center',
+          headerTitleStyle: {
+            fontSize: 26,
+            color: 'black',
+            fontFamily: 'RockSalt-Regular',
+          },
         }}
       />
       <Tabs.Screen
@@ -116,17 +122,23 @@ export default function TabLayout() {
       <Tabs.Screen
         name="notifications"
         options={{
-          title: '🔔 Notifications',
-          tabBarIcon: ({ color }) => <TabBarIcon name="bell" color={color} />,
-          tabBarLabel: 'Notifications'
+          title: 'Notifications',
+          tabBarIcon: ({ color }) => <TabBarIcon name="bell" color={color} />, 
+          tabBarLabel: 'Notifications',
+          headerTitleAlign: 'center',
+          headerTitleStyle: {
+            fontSize: 26,
+            color: 'black',
+            fontFamily: 'RockSalt-Regular',
+          },
         }}
-/>
+      />
       <Tabs.Screen
         name="messages"
         options={{
-          title: '💬 Messages',
+          title: 'Messages',
           tabBarLabel: 'Messages',
-          tabBarIcon: ({ color }) => <TabBarIcon name="envelope" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="envelope" color={color} />, 
           headerRight: () => (
             <Link href="/archivedMessages" asChild >
               <Pressable>
@@ -141,7 +153,12 @@ export default function TabLayout() {
               </Pressable>
             </Link>
           ),
-          
+          headerTitleAlign: 'center',
+          headerTitleStyle: {
+            fontSize: 26,
+            color: 'black',
+            fontFamily: 'RockSalt-Regular',
+          },
         }}
       />
     </Tabs>

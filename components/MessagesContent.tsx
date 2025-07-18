@@ -15,6 +15,26 @@ import { useArchive } from './ArchiveContext';
 import { useAuth } from './AuthContext';
 import { getApiUrl } from '@/constants/Config';
 
+interface GroupMember {
+  id: number;
+  username: string;
+  email: string;
+  avatar: string;
+  role: 'admin' | 'member' | 'moderator';
+}
+
+interface Group {
+  id: number;
+  name: string;
+  description: string;
+  avatar: string;
+  members: GroupMember[];
+  memberCount: number;
+  createdAt: string;
+  lastActivity: string;
+  isActive: boolean;
+}
+
 interface BackendMessage {
   id: number;
   content: string;
@@ -23,33 +43,12 @@ interface BackendMessage {
     username: string;
     email: string;
   };
-  receiver: {
+  group: {
     id: number;
-    username: string;
-    email: string;
+    name: string;
   };
   isRead: boolean;
   sentAt: string;
-  conversation: {
-    id: number;
-  };
-}
-
-interface Conversation {
-  id: number;
-  user1: {
-    id: number;
-    username: string;
-    email: string;
-  };
-  user2: {
-    id: number;
-    username: string;
-    email: string;
-  };
-  messages: BackendMessage[];
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface Message {
@@ -60,7 +59,10 @@ interface Message {
   avatar: string;
   isRead: boolean;
   type: 'received' | 'sent';
-  conversationId: number;
+  groupId: number;
+  groupName: string;
+  groupAvatar: string;
+  memberCount: number;
 }
 
 export default function MessagesContentInfo({ path, searchQuery }: { path: string; searchQuery?: string }) {
@@ -73,7 +75,7 @@ export default function MessagesContentInfo({ path, searchQuery }: { path: strin
   const { archivePost } = useArchive();
   const { user, token } = useAuth();
 
-    const fetchConversations = async () => {
+  const fetchGroupMessages = async () => {
     try {
       if (!token || !user) {
         console.log('No auth token or user available');
@@ -81,7 +83,7 @@ export default function MessagesContentInfo({ path, searchQuery }: { path: strin
         return;
       }
 
-      const response = await fetch(getApiUrl('/api/messages/conversations'), {
+      const response = await fetch(getApiUrl('/api/messages/groups'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -92,67 +94,53 @@ export default function MessagesContentInfo({ path, searchQuery }: { path: strin
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const conversations: Conversation[] = await response.json();
+      const groupMessages: BackendMessage[] = await response.json();
       
-      // Convert conversations to messages format
-      const allMessages: Message[] = [];
-      
-      for (const conversation of conversations) {
-        // Get messages for each conversation
-        const messagesResponse = await fetch(getApiUrl(`/api/messages/conversations/${conversation.id}`), {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (messagesResponse.ok) {
-          const conversationMessages: BackendMessage[] = await messagesResponse.json();
-          
-          // Convert backend messages to our format
-          const convertedMessages = conversationMessages.map(msg => {
-            const isSentByCurrentUser = msg.sender.id === user.id;
-            const otherUser = isSentByCurrentUser ? msg.receiver : msg.sender;
-            
-            return {
-              id: msg.id,
-              sender: otherUser.username,
-              content: msg.content,
-              timestamp: formatTimestamp(msg.sentAt),
-              avatar: getAvatarForUser(otherUser.username),
-              isRead: msg.isRead,
-              type: isSentByCurrentUser ? 'sent' : 'received',
-              conversationId: conversation.id,
-            } as Message;
-          });
-          
-          allMessages.push(...convertedMessages);
-        }
-      }
+      // Convert backend messages to our format
+      const convertedMessages = groupMessages.map(msg => {
+        const isSentByCurrentUser = msg.sender.id === user.id;
+        
+        return {
+          id: msg.id,
+          sender: msg.sender.username,
+          content: msg.content,
+          timestamp: formatTimestamp(msg.sentAt),
+          avatar: getAvatarForUser(msg.sender.username),
+          isRead: msg.isRead,
+          type: isSentByCurrentUser ? 'sent' : 'received',
+          groupId: msg.group.id,
+          groupName: msg.group.name,
+          groupAvatar: getGroupAvatar(msg.group.name),
+          memberCount: getGroupMemberCount(msg.group.id),
+        } as Message;
+      });
 
       // Sort messages by timestamp (newest first)
-      allMessages.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      convertedMessages.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       
-      setMessages(allMessages);
+      setMessages(convertedMessages);
     } catch (error) {
-      console.error('Failed to fetch conversations:', error);
+      console.error('Failed to fetch group messages:', error);
       // Fallback to mock data if API fails
-      setMessages(getMockMessages());
+      setMessages(getMockGroupMessages());
     } finally {
       setLoading(false);
     }
   };
 
-  const getMockMessages = (): Message[] => [
+  const getMockGroupMessages = (): Message[] => [
     {
       id: 1,
       sender: "Sarah Johnson",
-      content: "Hey! Are you still interested in joining our coding meetup this weekend?",
+      content: "Hey everyone! Are you still interested in joining our coding meetup this weekend?",
       timestamp: "2 min ago",
       avatar: "👩‍💻",
       isRead: false,
       type: 'received',
-      conversationId: 1
+      groupId: 1,
+      groupName: "React Devs",
+      groupAvatar: "⚛️",
+      memberCount: 12
     },
     {
       id: 2,
@@ -162,7 +150,10 @@ export default function MessagesContentInfo({ path, searchQuery }: { path: strin
       avatar: "👨‍💼",
       isRead: true,
       type: 'received',
-      conversationId: 2
+      groupId: 2,
+      groupName: "Startup Founders",
+      groupAvatar: "🚀",
+      memberCount: 8
     },
     {
       id: 3,
@@ -172,7 +163,10 @@ export default function MessagesContentInfo({ path, searchQuery }: { path: strin
       avatar: "😊",
       isRead: true,
       type: 'sent',
-      conversationId: 2
+      groupId: 2,
+      groupName: "Startup Founders",
+      groupAvatar: "🚀",
+      memberCount: 8
     },
     {
       id: 4,
@@ -182,7 +176,10 @@ export default function MessagesContentInfo({ path, searchQuery }: { path: strin
       avatar: "👩‍🎨",
       isRead: false,
       type: 'received',
-      conversationId: 3
+      groupId: 3,
+      groupName: "Design Masters",
+      groupAvatar: "🎨",
+      memberCount: 15
     },
     {
       id: 5,
@@ -192,7 +189,10 @@ export default function MessagesContentInfo({ path, searchQuery }: { path: strin
       avatar: "👨‍🔬",
       isRead: true,
       type: 'received',
-      conversationId: 4
+      groupId: 4,
+      groupName: "AI Researchers",
+      groupAvatar: "🤖",
+      memberCount: 23
     },
     {
       id: 6,
@@ -202,28 +202,115 @@ export default function MessagesContentInfo({ path, searchQuery }: { path: strin
       avatar: "😊",
       isRead: true,
       type: 'sent',
-      conversationId: 4
+      groupId: 4,
+      groupName: "AI Researchers",
+      groupAvatar: "🤖",
+      memberCount: 23
     },
     {
       id: 7,
-      sender: "Lisa Wang",
-      content: "Can you help me review this code? I'm stuck on this bug.",
+      sender: "Priya Patel",
+      content: "Don't forget our group call at 3pm!",
       timestamp: "2 hours ago",
-      avatar: "👩‍💻",
-      isRead: true,
+      avatar: "👩🏽‍💼",
+      isRead: false,
       type: 'received',
-      conversationId: 5
+      groupId: 5,
+      groupName: "Product Managers",
+      groupAvatar: "📊",
+      memberCount: 18
     },
     {
       id: 8,
-      sender: "David Kim",
-      content: "The workshop registration is now open. Don't miss out!",
+      sender: "You",
+      content: "I'll be there! Looking forward to it.",
+      timestamp: "2 hours ago",
+      avatar: "😊",
+      isRead: true,
+      type: 'sent',
+      groupId: 5,
+      groupName: "Product Managers",
+      groupAvatar: "📊",
+      memberCount: 18
+    },
+    {
+      id: 9,
+      sender: "Liam Smith",
+      content: "Can you review my PR when you get a chance?",
       timestamp: "3 hours ago",
-      avatar: "👨‍🏫",
+      avatar: "👨‍💻",
       isRead: false,
       type: 'received',
-      conversationId: 6
-    }
+      groupId: 6,
+      groupName: "Backend Engineers",
+      groupAvatar: "⚙️",
+      memberCount: 9
+    },
+    {
+      id: 10,
+      sender: "You",
+      content: "Sure thing! I'll check it out this afternoon.",
+      timestamp: "3 hours ago",
+      avatar: "😊",
+      isRead: true,
+      type: 'sent',
+      groupId: 6,
+      groupName: "Backend Engineers",
+      groupAvatar: "⚙️",
+      memberCount: 9
+    },
+    {
+      id: 11,
+      sender: "Nina Müller",
+      content: "Happy Friday! Any plans for the weekend?",
+      timestamp: "4 hours ago",
+      avatar: "👩‍🔬",
+      isRead: false,
+      type: 'received',
+      groupId: 7,
+      groupName: "Data Scientists",
+      groupAvatar: "📈",
+      memberCount: 14
+    },
+    {
+      id: 12,
+      sender: "You",
+      content: "Not yet! Maybe a hike if the weather is good.",
+      timestamp: "4 hours ago",
+      avatar: "😊",
+      isRead: true,
+      type: 'sent',
+      groupId: 7,
+      groupName: "Data Scientists",
+      groupAvatar: "📈",
+      memberCount: 14
+    },
+    {
+      id: 13,
+      sender: "Carlos Silva",
+      content: "The CNETWK event was awesome! Thanks for the invite.",
+      timestamp: "5 hours ago",
+      avatar: "👨🏽‍💼",
+      isRead: true,
+      type: 'received',
+      groupId: 8,
+      groupName: "Tech Entrepreneurs",
+      groupAvatar: "💼",
+      memberCount: 31
+    },
+    {
+      id: 14,
+      sender: "You",
+      content: "Glad you enjoyed it! Let's catch up soon.",
+      timestamp: "5 hours ago",
+      avatar: "😊",
+      isRead: true,
+      type: 'sent',
+      groupId: 8,
+      groupName: "Tech Entrepreneurs",
+      groupAvatar: "💼",
+      memberCount: 31
+    },
   ];
 
   const formatTimestamp = (timestamp: string): string => {
@@ -244,6 +331,50 @@ export default function MessagesContentInfo({ path, searchQuery }: { path: strin
     return avatars[index];
   };
 
+  const getGroupAvatar = (groupName: string): string => {
+    // Geeky group avatars based on group name
+    const groupAvatars: { [key: string]: string } = {
+      'React Devs': '⚛️',
+      'Startup Founders': '🚀',
+      'Design Masters': '🎨',
+      'AI Researchers': '🤖',
+      'Product Managers': '📊',
+      'Backend Engineers': '⚙️',
+      'Data Scientists': '📈',
+      'Tech Entrepreneurs': '💼',
+      'Mobile Devs': '📱',
+      'Web Developers': '🌐',
+      'DevOps Engineers': '🐳',
+      'UI/UX Designers': '🎭',
+      'Game Developers': '🎮',
+      'Cybersecurity': '🔒',
+      'Blockchain Devs': '⛓️',
+      'Cloud Engineers': '☁️',
+      'Machine Learning': '🧠',
+      'Frontend Masters': '🎯',
+      'Full Stack Devs': '🔄',
+      'Open Source': '❤️',
+    };
+    
+    return groupAvatars[groupName] || '👥';
+  };
+
+  const getGroupMemberCount = (groupId: number): number => {
+    // Mock member counts for different groups
+    const memberCounts: { [key: number]: number } = {
+      1: 12, // React Devs
+      2: 8,  // Startup Founders
+      3: 15, // Design Masters
+      4: 23, // AI Researchers
+      5: 18, // Product Managers
+      6: 9,  // Backend Engineers
+      7: 14, // Data Scientists
+      8: 31, // Tech Entrepreneurs
+    };
+    
+    return memberCounts[groupId] || Math.floor(Math.random() * 20) + 5;
+  };
+
   const markMessageAsRead = async (messageId: number) => {
     try {
       if (!token) return;
@@ -262,7 +393,11 @@ export default function MessagesContentInfo({ path, searchQuery }: { path: strin
 
   useEffect(() => {
     if (user && token) {
-      fetchConversations();
+      fetchGroupMessages();
+    } else {
+      // Use mock data if no auth
+      setMessages(getMockGroupMessages());
+      setLoading(false);
     }
   }, [user, token]);
 
@@ -287,7 +422,7 @@ export default function MessagesContentInfo({ path, searchQuery }: { path: strin
   const handleArchive = (message: Message) => {
     archivePost({
       id: message.id,
-      title: message.sender,
+      title: `${message.groupName} - ${message.sender}`,
       body: message.content,
       message: null
     });
@@ -319,17 +454,26 @@ export default function MessagesContentInfo({ path, searchQuery }: { path: strin
       activeOpacity={0.8}
     >
       <View style={styles.messageHeader}>
-        <Text style={styles.avatar}>{item.avatar}</Text>
-        <View style={styles.messageInfo}>
-          <Text style={styles.senderName}>{item.sender}</Text>
-          <Text style={styles.timestamp}>{item.timestamp}</Text>
+        <View style={styles.groupInfo}>
+          <Text style={styles.groupAvatar}>{item.groupAvatar}</Text>
+          <View style={styles.groupDetails}>
+            <Text style={styles.groupName}>{item.groupName}</Text>
+            <Text style={styles.memberCount}>{item.memberCount} members</Text>
+          </View>
         </View>
+        <Text style={styles.timestamp}>{item.timestamp}</Text>
         {!item.isRead && item.type === 'received' && (
           <View style={styles.unreadIndicator} />
         )}
       </View>
       
-      <Text style={styles.messageContent}>{item.content}</Text>
+      <View style={styles.messageContent}>
+        <View style={styles.senderInfo}>
+          <Text style={styles.senderAvatar}>{item.avatar}</Text>
+          <Text style={styles.senderName}>{item.sender}</Text>
+        </View>
+        <Text style={styles.messageText}>{item.content}</Text>
+      </View>
       
       {selectedMessage === item.id && (
         <View style={styles.actionButtons}>
@@ -357,7 +501,8 @@ export default function MessagesContentInfo({ path, searchQuery }: { path: strin
   const filteredMessages = searchQuery 
     ? messages.filter(msg => 
         msg.sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        msg.content.toLowerCase().includes(searchQuery.toLowerCase())
+        msg.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        msg.groupName.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : messages;
 
@@ -366,14 +511,13 @@ export default function MessagesContentInfo({ path, searchQuery }: { path: strin
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={isDark ? '#BB86FC' : '#6A0DAD'} />
-          <Text style={styles.loadingText}>Loading messages...</Text>
+          <Text style={styles.loadingText}>Loading group messages...</Text>
         </View>
       ) : (
         <>
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Messages</Text>
             <Text style={styles.messageCount}>
-              {filteredMessages.length} of {messages.length} conversations
+              {filteredMessages.length} of {messages.length} group conversations
             </Text>
           </View>
           
@@ -384,7 +528,7 @@ export default function MessagesContentInfo({ path, searchQuery }: { path: strin
                 size={48} 
                 color={isDark ? '#BB86FC' : '#6A0DAD'} 
               />
-              <Text style={styles.emptySearchTitle}>No messages found</Text>
+              <Text style={styles.emptySearchTitle}>No group messages found</Text>
               <Text style={styles.emptySearchSubtitle}>
                 Try adjusting your search terms
               </Text>
@@ -470,20 +614,30 @@ const getStyles = (isDark: boolean) =>
     messageHeader: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 8,
+      marginBottom: 12,
+      justifyContent: 'space-between',
     },
-    avatar: {
-      fontSize: 24,
-      marginRight: 12,
-    },
-    messageInfo: {
+    groupInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
       flex: 1,
     },
-    senderName: {
+    groupAvatar: {
+      fontSize: 28,
+      marginRight: 12,
+    },
+    groupDetails: {
+      flex: 1,
+    },
+    groupName: {
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: '700',
       color: isDark ? '#FFFFFF' : '#1A1A1A',
       marginBottom: 2,
+    },
+    memberCount: {
+      fontSize: 12,
+      color: isDark ? '#AAAAAA' : '#6C757D',
     },
     timestamp: {
       fontSize: 12,
@@ -494,11 +648,30 @@ const getStyles = (isDark: boolean) =>
       height: 8,
       borderRadius: 4,
       backgroundColor: '#FF3B30',
+      marginLeft: 8,
     },
     messageContent: {
+      marginTop: 8,
+    },
+    senderInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    senderAvatar: {
+      fontSize: 20,
+      marginRight: 8,
+    },
+    senderName: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: isDark ? '#E0E0E0' : '#2C3E50',
+    },
+    messageText: {
       fontSize: 15,
       lineHeight: 20,
       color: isDark ? '#E0E0E0' : '#2C3E50',
+      marginLeft: 28,
     },
     actionButtons: {
       flexDirection: 'row',

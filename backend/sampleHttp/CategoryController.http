@@ -1,0 +1,9 @@
+### CategoryController HTTP Requests
+
+# 1. Get All Categories
+GET http://localhost:8080/api/categories
+
+###
+
+# 2. Get Category by ID
+GET http://localhost:8080/api/categories/1 

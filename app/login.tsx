@@ -18,6 +18,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '@/components/AuthContext';
 import NetworkDebug from '@/components/NetworkDebug';
+import AnimatedSplash from '../components/AnimatedSplash';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -25,6 +26,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSplash, setShowSplash] = useState(false);
   const router = useRouter();
   const { login } = useAuth();
 
@@ -40,7 +42,7 @@ export default function LoginScreen() {
     try {
       const success = await login(email, password);
       if (success) {
-        router.replace('/(tabs)/home');
+        setShowSplash(true);
       } else {
         setError('Login failed. Please check your credentials.');
       }
@@ -50,6 +52,12 @@ export default function LoginScreen() {
       setLoading(false);
     }
   };
+
+  if (showSplash) {
+    return (
+      <AnimatedSplash onFinish={() => router.replace('/(tabs)/home')} />
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -119,18 +127,18 @@ export default function LoginScreen() {
 
             <View style={styles.signupContainer}>
               <Text style={styles.signupText}>Don't have an account?</Text>
-                          <TouchableOpacity>
-              <Text style={styles.signupLink}>Sign Up</Text>
-            </TouchableOpacity>
+              <TouchableOpacity>
+                <Text style={styles.signupLink}>Sign Up</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
 
-        {/* Network Debug Component - Remove this in production */}
-        <NetworkDebug />
-      </ScrollView>
-    </TouchableWithoutFeedback>
-  </KeyboardAvoidingView>
-);
+          {/* Network Debug Component - Remove this in production */}
+          <NetworkDebug />
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
+  );
 }
 
 const styles = StyleSheet.create({

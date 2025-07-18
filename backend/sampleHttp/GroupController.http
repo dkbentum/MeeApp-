@@ -1,0 +1,62 @@
+### GroupController HTTP Requests
+
+# 1. Get Public Groups
+GET http://localhost:8080/api/groups/public
+
+###
+
+# 2. Get Group by ID
+GET http://localhost:8080/api/groups/1
+
+###
+
+# 3. Create Group
+POST http://localhost:8080/api/groups
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "React Devs",
+  "description": "A group for React developers"
+}
+
+###
+
+# 4. Update Group
+PUT http://localhost:8080/api/groups/1
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "Updated Group Name",
+  "description": "Updated description"
+}
+
+###
+
+# 5. Delete Group
+DELETE http://localhost:8080/api/groups/1
+Authorization: Bearer <token>
+
+###
+
+# 6. Join Group
+POST http://localhost:8080/api/groups/1/join
+Authorization: Bearer <token>
+
+###
+
+# 7. Leave Group
+DELETE http://localhost:8080/api/groups/1/leave
+Authorization: Bearer <token>
+
+###
+
+# 8. Search Groups
+GET http://localhost:8080/api/groups/search?query=react
+
+###
+
+# 9. Get My Groups
+GET http://localhost:8080/api/groups/my-groups
+Authorization: Bearer <token> 

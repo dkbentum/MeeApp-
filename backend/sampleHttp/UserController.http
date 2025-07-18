@@ -1,0 +1,31 @@
+### UserController HTTP Requests
+
+# 1. Get Current User
+GET http://localhost:8080/api/users/me
+Authorization: Bearer <token>
+
+###
+
+# 2. Get User by ID
+GET http://localhost:8080/api/users/1
+Authorization: Bearer <token>
+
+###
+
+# 3. Search Users
+GET http://localhost:8080/api/users/search?query=alex
+Authorization: Bearer <token>
+
+###
+
+# 4. Update Profile
+PUT http://localhost:8080/api/users/me
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "username": "updateduser",
+  "email": "updated@example.com",
+  "firstName": "Updated",
+  "lastName": "User"
+} 
