@@ -15,6 +15,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+  private final Logger log = LoggerFactory.getLogger(AuthController.class);
   @Autowired AuthenticationManager authenticationManager;
 
   @Autowired UserRepository userRepository;
@@ -45,6 +49,7 @@ public class AuthController {
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 loginRequest.getEmail(), loginRequest.getPassword()));
+    log.info(authentication.getPrincipal().toString());
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
     String jwt = jwtUtils.generateJwtToken(authentication);
@@ -88,6 +93,7 @@ public class AuthController {
     if (strRoles == null) {
       Role role = new Role(ERole.ROLE_USER);
       Role userRole = roleRepository.findByName(Role.ERole.ROLE_USER).orElse(role);
+      roleRepository.save(userRole);
       roles.add(userRole);
     } else {
       strRoles.forEach(
@@ -116,7 +122,6 @@ public class AuthController {
             }
           });
     }
-
     user.setRoles(roles);
     userRepository.save(user);
 
