@@ -4,122 +4,196 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
 
-    @NotBlank
-    @Size(max = 50)
-    @Column(unique = true)
-    private String username;
+  @NotBlank
+  @Size(max = 50)
+  @Column(unique = true)
+  private String username;
 
-    @NotBlank
-    @Size(max = 100)
-    @Email
-    @Column(unique = true)
-    private String email;
+  @NotBlank
+  @Size(max = 100)
+  @Email
+  @Column(unique = true)
+  private String email;
 
-    @NotBlank
-    @Size(max = 120)
-    private String password;
+  @NotBlank
+  @Size(max = 120)
+  private String password;
 
-    @Size(max = 100)
-    private String firstName;
+  @Size(max = 100)
+  private String firstName;
 
-    @Size(max = 100)
-    private String lastName;
+  @Size(max = 100)
+  private String lastName;
 
-    @Size(max = 500)
-    private String bio;
+  @Size(max = 500)
+  private String bio;
 
-    private String profileImageUrl;
+  private String profileImageUrl;
 
-    private String location;
+  private String location;
 
-    private Boolean emailVerified = false;
+  private Boolean emailVerified = false;
 
-    private Boolean isActive = true;
+  private Boolean isActive = true;
 
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
+  @CreatedDate
+  @Column(updatable = false)
+  private LocalDateTime createdAt;
 
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+  @LastModifiedDate private LocalDateTime updatedAt;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "user_roles",
+      joinColumns = @JoinColumn(name = "user_id"),
+      inverseJoinColumns = @JoinColumn(name = "role_id"))
+  private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<UserInterest> interests = new HashSet<>();
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private Set<UserInterest> interests = new HashSet<>();
 
-    // Constructors
-    public User() {}
+  // Constructors
+  public User() {}
 
-    public User(String username, String email, String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-    }
+  public User(String username, String email, String password) {
+    this.username = username;
+    this.email = email;
+    this.password = password;
+  }
 
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+  // Getters and Setters
+  public Long getId() {
+    return id;
+  }
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+  public String getUsername() {
+    return username;
+  }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+  public void setUsername(String username) {
+    this.username = username;
+  }
 
-    public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
+  public String getEmail() {
+    return email;
+  }
 
-    public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-    public String getBio() { return bio; }
-    public void setBio(String bio) { this.bio = bio; }
+  public String getPassword() {
+    return password;
+  }
 
-    public String getProfileImageUrl() { return profileImageUrl; }
-    public void setProfileImageUrl(String profileImageUrl) { this.profileImageUrl = profileImageUrl; }
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+  public String getFirstName() {
+    return firstName;
+  }
 
-    public Boolean getEmailVerified() { return emailVerified; }
-    public void setEmailVerified(Boolean emailVerified) { this.emailVerified = emailVerified; }
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
 
-    public Boolean getIsActive() { return isActive; }
-    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
+  public String getLastName() {
+    return lastName;
+  }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+  public String getBio() {
+    return bio;
+  }
 
-    public Set<Role> getRoles() { return roles; }
-    public void setRoles(Set<Role> roles) { this.roles = roles; }
+  public void setBio(String bio) {
+    this.bio = bio;
+  }
 
-    public Set<UserInterest> getInterests() { return interests; }
-    public void setInterests(Set<UserInterest> interests) { this.interests = interests; }
+  public String getProfileImageUrl() {
+    return profileImageUrl;
+  }
+
+  public void setProfileImageUrl(String profileImageUrl) {
+    this.profileImageUrl = profileImageUrl;
+  }
+
+  public String getLocation() {
+    return location;
+  }
+
+  public void setLocation(String location) {
+    this.location = location;
+  }
+
+  public Boolean getEmailVerified() {
+    return emailVerified;
+  }
+
+  public void setEmailVerified(Boolean emailVerified) {
+    this.emailVerified = emailVerified;
+  }
+
+  public Boolean getIsActive() {
+    return isActive;
+  }
+
+  public void setIsActive(Boolean isActive) {
+    this.isActive = isActive;
+  }
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
+  }
+
+  public Set<Role> getRoles() {
+    return roles;
+  }
+
+  public void setRoles(Set<Role> roles) {
+    this.roles = roles;
+  }
+
+  public Set<UserInterest> getInterests() {
+    return interests;
+  }
+
+  public void setInterests(Set<UserInterest> interests) {
+    this.interests = interests;
+  }
 }

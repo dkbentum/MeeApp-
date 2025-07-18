@@ -20,6 +20,5 @@ Content-Type: application/json
   "email": "kratosgasdo@gmail.com",
   "password": "password123",
   "firstName": "Kratos",
-  "lastName": "Gado",
-  "roles": ["user"]
-} 
+  "lastName": "Gado"
+}
