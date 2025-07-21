@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, useColorScheme } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View, useColorScheme, TextInput, ActivityIndicator, Alert } from 'react-native';
 
 const PURPLE = '#6A0DAD';
 const LIGHT_PURPLE = '#F2E8FF';
@@ -13,6 +13,49 @@ const GroupSection = () => {
   const isDark = theme === 'dark';
   const styles = getStyles(isDark);
 
+  // State for group creation
+  const [groupName, setGroupName] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [joinGroupId, setJoinGroupId] = useState('');
+  const [joining, setJoining] = useState(false);
+
+  const handleCreateGroup = async () => {
+    if (!groupName) return;
+    setCreating(true);
+    try {
+      const res = await fetch('https://meeapp.onrender.com/api/groups', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: groupName })
+      });
+      if (!res.ok) throw new Error('Failed to create group');
+      Alert.alert('Success', 'Group created!');
+      setGroupName('');
+    } catch (err) {
+      Alert.alert('Error', 'Failed to create group.');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleJoinGroup = async () => {
+    if (!joinGroupId) return;
+    setJoining(true);
+    try {
+      const res = await fetch(`https://meeapp.onrender.com/api/groups/${joinGroupId}/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!res.ok) throw new Error('Failed to join group');
+      Alert.alert('Success', 'Joined group!');
+      setJoinGroupId('');
+    } catch (err) {
+      Alert.alert('Error', 'Failed to join group.');
+    } finally {
+      setJoining(false);
+    }
+  };
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.section}>
@@ -22,8 +65,34 @@ const GroupSection = () => {
       </View>
       <TouchableOpacity style={styles.groupStart}>
         <Text style={styles.groupTitle}>🏆 Start a new group</Text>
-        <Text style={styles.groupText}>Organize your own events</Text>
+        <Text style={styles.groupText}>Organize your own CNETs and WK sessions</Text>
       </TouchableOpacity>
+      {/* Group creation UI */}
+      <View style={{ marginTop: 20 }}>
+        <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>Create Group</Text>
+        <TextInput
+          style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8, marginBottom: 8 }}
+          placeholder="Group Name"
+          value={groupName}
+          onChangeText={setGroupName}
+        />
+        <TouchableOpacity style={{ backgroundColor: PURPLE, borderRadius: 8, padding: 10, alignItems: 'center' }} onPress={handleCreateGroup} disabled={creating}>
+          {creating ? <ActivityIndicator color="#fff" /> : <Text style={{ color: '#fff', fontWeight: 'bold' }}>Create</Text>}
+        </TouchableOpacity>
+      </View>
+      {/* Group join UI */}
+      <View style={{ marginTop: 20 }}>
+        <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>Join Group</Text>
+        <TextInput
+          style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8, marginBottom: 8 }}
+          placeholder="Group ID"
+          value={joinGroupId}
+          onChangeText={setJoinGroupId}
+        />
+        <TouchableOpacity style={{ backgroundColor: PURPLE, borderRadius: 8, padding: 10, alignItems: 'center' }} onPress={handleJoinGroup} disabled={joining}>
+          {joining ? <ActivityIndicator color="#fff" /> : <Text style={{ color: '#fff', fontWeight: 'bold' }}>Join</Text>}
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

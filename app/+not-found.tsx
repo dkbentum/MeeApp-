@@ -8,9 +8,11 @@ export default function NotFoundScreen() {
     <>
       <Stack.Screen options={{ title: 'Oops!' }} />
       <View style={styles.container}>
-        <Text style={styles.title}>This screen doesn't exist.</Text>
-        <Link href="/" style={styles.link}>
-          <Text style={styles.linkText}>Go to home screen!</Text>
+        <Text style={styles.emoji}>😕</Text>
+        <Text style={styles.title}>Page Not Found</Text>
+        <Text style={styles.subtitle}>Sorry, the page you are looking for doesn't exist or has been moved.</Text>
+        <Link href="/home" style={styles.button}>
+          <Text style={styles.buttonText}>🏠 Go to Home Screen</Text>
         </Link>
       </View>
     </>
@@ -23,17 +25,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
+    backgroundColor: '#fff',
+  },
+  emoji: {
+    fontSize: 48,
+    marginBottom: 16,
   },
   title: {
-    fontSize: 20,
+    fontSize: 26,
     fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#333',
   },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 24,
+    textAlign: 'center',
   },
-  linkText: {
-    fontSize: 14,
-    color: '#2e78b7',
+  button: {
+    backgroundColor: '#6A0DAD',
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

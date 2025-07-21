@@ -5,6 +5,8 @@ import NoConnectionsIllustration from '../../components/NoConnectionsIllustratio
 import HowToConnectSection from '../../components/HowToConectSection';
 import ConnectedPersonCard from '../../components/ConnectedPersonCard';
 import MutualSkillsCard from '@/components/MutualSkillsCard';
+import YourWKPosts from '../../components/YourWKPosts';
+import imageF from '../../assets/images/imagesF.jpeg';
 
 export default function ConnectionsScreen() {
   const isDark = useColorScheme() === 'dark';
@@ -14,9 +16,10 @@ export default function ConnectionsScreen() {
       <ExploreConnectionsCard />
       <NoConnectionsIllustration />
       <View style={styles.separator} />
-      <ConnectedPersonCard name={''} title={''} avatar={undefined}/>
+      <ConnectedPersonCard name={'Jane Doe'} title={'UI/UX Designer'} avatar={imageF}/>
       <HowToConnectSection />
       <MutualSkillsCard skills={['list', 'of', 'mutual', 'skills' ]}/>
+      <YourWKPosts />
     </ScrollView>
 
   );

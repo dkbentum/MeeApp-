@@ -5,10 +5,12 @@ import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { ArchiveProvider } from '@/components/ArchiveContext';
 import { AuthProvider } from '@/components/AuthContext';
+import { InterestsProvider } from '@/components/InterestsContext';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -43,7 +45,11 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <RootLayoutNav />
+    </GestureHandlerRootView>
+  );
 }
 
 function RootLayoutNav() {
@@ -52,14 +58,20 @@ function RootLayoutNav() {
   return (
     <AuthProvider>
       <ArchiveProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack initialRouteName='login'>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="login" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="archivedMessages" options={{ presentation: 'modal' }} />
-          </Stack>
-        </ThemeProvider>
+        <InterestsProvider>
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <Stack initialRouteName='login'>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="PostDetailScreen" options={{ title: 'Post Details' }} />
+              <Stack.Screen name="CreateWKPostScreen" options={{ title: 'Create WK-Post' }} />
+              <Stack.Screen name="profile" options={{ title: 'Profile' }} />
+              <Stack.Screen name="signup" options={{ title: 'Sign Up' }} />
+              <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+              <Stack.Screen name="login" options={{ presentation: 'modal' }} />
+              <Stack.Screen name="archivedMessages" options={{ presentation: 'modal' }} />
+            </Stack>
+          </ThemeProvider>
+        </InterestsProvider>
       </ArchiveProvider>
     </AuthProvider>
   );

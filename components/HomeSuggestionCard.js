@@ -5,7 +5,19 @@ import { useRouter } from 'expo-router';
 const PURPLE = '#6A0DAD';
 const DARK_PURPLE = '#4B0082';
 
-const SuggestionCard = () => {
+const getTabMessage = (tab) => {
+  switch (tab) {
+    case 'Going':
+      return 'You are all set for your upcoming CNETs and WK!';
+    case 'Saved':
+      return 'Here are your saved CNETs and WK opportunities!';
+    case 'Suggested':
+    default:
+      return 'You have 5 suggestions for new CNETs and WK';
+  }
+};
+
+const SuggestionCard = ({ selectedTab = 'Suggested' }) => {
   const theme = useColorScheme();
   const isDark = theme === 'dark';
   const styles = getStyles(isDark);
@@ -13,10 +25,10 @@ const SuggestionCard = () => {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>Find your next gig</Text>
-      <Text style={styles.cardText}>You have 5 suggestions for upcoming gigs</Text>
+      <Text style={styles.cardTitle}>Find your next CNET & WK</Text>
+      <Text style={styles.cardText}>{getTabMessage(selectedTab)}</Text>
       <TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)/connections')}>
-        <Text style={styles.buttonText}>View suggested work-events</Text>
+        <Text style={styles.buttonText}>View suggested CNETs & WK</Text>
       </TouchableOpacity>
     </View>
   );

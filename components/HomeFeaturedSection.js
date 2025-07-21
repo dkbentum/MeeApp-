@@ -13,8 +13,8 @@ const FeaturedSection = () => {
   return (
     <View style={styles.wrapper}>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>🔥 Featured Events</Text>
-        <Text style={styles.sectionText}>Don’t miss out on trending events in your city</Text>
+        <Text style={styles.sectionTitle}>🔥 Featured CNETs & WK</Text>
+        <Text style={styles.sectionText}>Don’t miss out on trending CNETs and WK in your city</Text>
       </View>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>👑 Popular Groups</Text>

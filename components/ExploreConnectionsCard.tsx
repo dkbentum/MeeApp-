@@ -7,7 +7,7 @@ const ExploreConnectionsCard = () => {
   return (
     <View style={[styles.card, { backgroundColor: isDark ? '#4B0082' : '#D8B4FE' }]}>
       <Text style={[styles.text, { color: isDark ? '#fff' : '#1E1E1E' }]}>
-        Meet new connections at your next event
+        Meet new CNET and WK partners
       </Text>
       <View style={styles.avatarsRow}>
         {[require('../assets/images/imageB.jpg'), require('../assets/images/imageA.jpg'), require('../assets/images/imageC.jpg')].map((src, idx) => (

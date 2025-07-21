@@ -6,9 +6,6 @@ export default function HomeScreen() {
   return (
     <View style={styles.outerContainer}>
       <View style={styles.container}>
-        {/* Visible title */}
-        {/* <Text style={styles.title}>🖖 Heyy, new_user</Text> */}
-        {/* Your HomeContentInfo component */}
         <HomeContentInfo />
       </View>
     </View>

@@ -12,7 +12,7 @@ export default function MessagesScreen() {
   const styles = getStyles(isDark);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: isDark ? '#181828' : '#F6F0FF' }]}>
       {/* Search Header */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
@@ -50,9 +50,7 @@ export default function MessagesScreen() {
       <MessagesContentInfo path="app/(tabs)/messages.tsx" searchQuery={searchQuery} />
 
       {/* Floating Add Button */}
-      <TouchableOpacity style={styles.fab} onPress={() => console.log('Add Message')}>
-        <Ionicons name="add" size={28} color="white" />
-      </TouchableOpacity>
+      {/* Removed the floating + button as requested */}
     </View>
   );
 }

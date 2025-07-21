@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, useColorScheme } from 'react-native';
 
 const steps = [
-  'Attend an event',
+  'Join a CNET & WK session',
   'Open the app',
-  'Choose connections up to 24 hours after the event',
+  'Choose CNETs up to 24 hours after the CNET & WK session',
 ];
 
 const HowToConnectSection = () => {

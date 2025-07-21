@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, useColorScheme } from 'react-native';
 
 import ConnectButton from '../components/HomeConnectButton';
 import FeaturedSection from '../components/HomeFeaturedSection';
@@ -10,24 +10,21 @@ import SuggestionCard from '../components/HomeSuggestionCard';
 import Tab from '../components/HomeTab';
 import HomeWelcomeCard from '../components/HomeWelcomeCard';
 import HomeFeaturedImage from '../components/HomeFeaturedImage';
+import { useInterests } from './InterestsContext';
 
-const INTERESTS = [
-  'AI', 'Fitness', 'Startups', 'Music', 'Gaming', 'Tech Talks',
-  'Design', 'Photography', 'Spirituality', 'Health', 'Entrepreneurship', 'Networking'
-];
-
-const RECOMMENDED_TOPICS = ['AI Events', 'UX Meetups', 'Weekend Hackathons', 'Remote Jobs', 'Local Workshops'];
+const RECOMMENDED_TOPICS = ['AI CNETs', 'UX WK Jams', 'Weekend WK Sprints', 'Remote WK', 'Local CNETs'];
 
 export default function HomeContentInfo() {
   const [selectedTab, setSelectedTab] = useState('Suggested');
   const theme = useColorScheme(); // 'light' or 'dark'
   const isDark = theme === 'dark';
+  const { interests } = useInterests();
 
   const themedStyles = useMemo(() => createStyles(isDark), [isDark]);
 
   return (
     <ScrollView contentContainerStyle={themedStyles.container}>
-      <Text style={themedStyles.title}>Work Events Ahead</Text>
+      <Text style={themedStyles.title}>CNET & WK Opportunities Ahead</Text>
 
       <View style={themedStyles.tabRow}>
         <Tab label="Going" active={selectedTab === 'Going'} badgeCount={0} onPress={() => setSelectedTab('Going')} />
@@ -36,7 +33,7 @@ export default function HomeContentInfo() {
       </View>
 
       <View style={[themedStyles.sectionContainer, themedStyles.fullWidth]}>
-        <SuggestionCard />
+        <SuggestionCard selectedTab={selectedTab} />
       </View>
 
       <View style={themedStyles.separator} />
@@ -46,7 +43,7 @@ export default function HomeContentInfo() {
 
       <View style={themedStyles.separator} />
       <View style={[themedStyles.sectionContainer, themedStyles.fullWidth]}>
-        <InterestsSection interests={INTERESTS} />
+        <InterestsSection interests={interests} />
       </View>
 
       <View style={themedStyles.separator} />

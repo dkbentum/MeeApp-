@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, View, ActivityIndicator, useColorScheme, Pressable, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { FlatList, StyleSheet, View, ActivityIndicator, useColorScheme, Pressable, Alert, Text as RNText } from 'react-native';
 import { Text } from './Themed';
 import { useRouter } from 'expo-router';
+import { Swipeable } from 'react-native-gesture-handler';
 
 // Notification types: 'interest', 'system', 'general', 'group_message', 'group_invite', 'group_event', 'like'
-type Notification = {
+export type Notification = {
   id: string;
-  type: 'interest' | 'system' | 'general' | 'group_message' | 'group_invite' | 'group_event' | 'like' | 'group_activity';
+  type: 'interest' | 'system' | 'general' | 'group_message' | 'group_invite' | 'group_event' | 'like' | 'group_activity' | 'reminder';
   title: string;
   message: string;
   timestamp: string;
@@ -15,7 +16,7 @@ type Notification = {
   avatarUrl?: string; // for future use
 };
 
-const mockNotifications: Notification[] = [
+export const mockNotifications: Notification[] = [
   {
     id: '1',
     type: 'interest',
@@ -27,21 +28,21 @@ const mockNotifications: Notification[] = [
     id: '2',
     type: 'system',
     title: 'Welcome to CNETWK!',
-    message: 'Thanks for joining. Explore and connect with others!',
+    message: 'Thanks for joining. Explore and CNET with others!',
     timestamp: '5 min ago',
   },
   {
     id: '3',
     type: 'general',
-    title: 'New Connection Request',
-    message: 'Alex sent you a connection request.',
+    title: 'New CNET Request',
+    message: 'Alex sent you a CNET request.',
     timestamp: '10 min ago',
   },
   {
     id: '4',
     type: 'interest',
-    title: 'Event Recommendation',
-    message: 'Check out the upcoming Meetup for your interests.',
+    title: 'CNET Recommendation',
+    message: 'Check out the upcoming CNET & WK session for your interests.',
     timestamp: '1 hr ago',
   },
   {
@@ -55,7 +56,7 @@ const mockNotifications: Notification[] = [
     id: '6',
     type: 'group_message',
     title: 'New Message in React Devs',
-    message: 'Sarah: "Hey everyone! Are you still interested in joining our coding meetup this weekend?"',
+    message: 'Sarah: "Hey everyone! Are you still interested in joining our CNET & WK session this weekend?"',
     timestamp: '2 hrs ago',
     groupName: 'React Devs',
     groupId: 1,
@@ -72,8 +73,8 @@ const mockNotifications: Notification[] = [
   {
     id: '8',
     type: 'group_event',
-    title: 'Event Reminder: Tech Networking',
-    message: 'Don\'t forget the "Tech Networking" event tomorrow at 6pm.',
+    title: 'WK Reminder: Tech Networking',
+    message: 'Don\'t forget the "Tech Networking" CNET & WK session tomorrow at 6pm.',
     timestamp: '5 hrs ago',
     groupName: 'Tech Entrepreneurs',
     groupId: 8,
@@ -132,21 +133,70 @@ const mockNotifications: Notification[] = [
   },
 ];
 
-export default function NotificationsContentInfo() {
+interface NotificationsContentInfoProps {
+  notifications?: Notification[];
+  setNotifications?: (n: Notification[]) => void;
+  onDeleteNotification?: (id: string) => void;
+}
+
+function formatTimestamp(iso: string): string {
+  const date = new Date(iso);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHr = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHr / 24);
+  if (diffDay > 1) return date.toLocaleDateString();
+  if (diffDay === 1) return 'Yesterday';
+  if (diffHr >= 1) return `${diffHr} hour${diffHr > 1 ? 's' : ''} ago`;
+  if (diffMin >= 1) return `${diffMin} minute${diffMin > 1 ? 's' : ''} ago`;
+  return 'Just now';
+}
+
+export default function NotificationsContentInfo({ notifications: externalNotifications, setNotifications: setExternalNotifications, onDeleteNotification }: NotificationsContentInfoProps = {}) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [ellipsis, setEllipsis] = useState('.');
   const theme = useColorScheme();
   const isDark = theme === 'dark';
   const styles = getStyles(isDark);
   const router = useRouter();
 
   useEffect(() => {
-    // Simulate fetch
-    setTimeout(() => {
-      setNotifications(mockNotifications);
+    if (externalNotifications && setExternalNotifications) {
       setLoading(false);
-    }, 600);
+    } else {
+      setTimeout(() => {
+        setNotifications(mockNotifications);
+        setLoading(false);
+      }, 600);
+    }
   }, []);
+
+  useEffect(() => {
+    if (!loading) return;
+    const interval = setInterval(() => {
+      setEllipsis(e => (e.length < 3 ? e + '.' : '.'));
+    }, 500);
+    return () => clearInterval(interval);
+  }, [loading]);
+
+  const handleDelete = (id: string) => {
+    if (onDeleteNotification) {
+      onDeleteNotification(id);
+    } else {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }
+  };
+
+  const renderRightActions = (id: string) => (
+    <View style={styles.deleteAction}>
+      <Pressable onPress={() => handleDelete(id)} style={styles.deleteButton}>
+        <RNText style={styles.deleteText}>Delete</RNText>
+      </Pressable>
+    </View>
+  );
 
   const getTypeColor = (type: Notification['type']) => {
     switch (type) {
@@ -199,20 +249,33 @@ export default function NotificationsContentInfo() {
   };
 
   const renderNotification = ({ item }: { item: Notification }) => (
-    <Pressable onPress={() => handlePress(item)} style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}>
-      <Text style={[styles.title, { color: getTypeColor(item.type) }]}>{item.title}</Text>
-      <Text style={styles.message}>{item.message}</Text>
-      {item.groupName && (
-        <Text style={styles.groupName}>📱 {item.groupName}</Text>
-      )}
-      <Text style={styles.timestamp}>{item.timestamp}</Text>
-    </Pressable>
+    <Swipeable renderRightActions={() => renderRightActions(item.id)}>
+      <Pressable onPress={() => handlePress(item)} style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}>
+        <Text style={[styles.title, { color: getTypeColor(item.type) }]}>{item.title}</Text>
+        <Text style={styles.message}>{item.message}</Text>
+        {item.groupName && (
+          <Text style={styles.groupName}>📱 {item.groupName}</Text>
+        )}
+        <Text style={styles.timestamp}>{formatTimestamp(item.timestamp)}</Text>
+      </Pressable>
+    </Swipeable>
   );
 
   return (
     <View style={styles.container}>
-      {loading ? (
-        <ActivityIndicator size="large" color={getTypeColor('interest')} />
+      {loading && (
+        <View style={styles.loadingOverlay} pointerEvents="auto">
+          <ActivityIndicator size="large" color={isDark ? '#fff' : '#6D0080'} />
+        </View>
+      )}
+      {!loading && (externalNotifications && setExternalNotifications ? (
+        <FlatList
+          data={externalNotifications}
+          keyExtractor={(item) => item.id}
+          renderItem={renderNotification}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+        />
       ) : notifications.length === 0 ? (
         <Text style={styles.empty}>No notifications yet.</Text>
       ) : (
@@ -223,7 +286,7 @@ export default function NotificationsContentInfo() {
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
         />
-      )}
+      ))}
     </View>
   );
 }
@@ -233,11 +296,11 @@ const getStyles = (isDark: boolean) =>
     container: {
       flex: 1,
       backgroundColor: isDark ? '#1A1333' : '#F6F0FF',
-      paddingHorizontal: 18,
       paddingTop: 18,
     },
     list: {
       paddingBottom: 30,
+      paddingHorizontal: 18,
     },
     card: {
       backgroundColor: isDark ? '#23203a' : '#fff',
@@ -248,7 +311,8 @@ const getStyles = (isDark: boolean) =>
       shadowOpacity: 0.10,
       shadowOffset: { width: 0, height: 2 },
       shadowRadius: 8,
-      elevation: 2,
+      elevation: 3,
+      marginHorizontal: 0,
     },
     cardPressed: {
       opacity: 0.7,
@@ -279,5 +343,71 @@ const getStyles = (isDark: boolean) =>
       color: '#888',
       marginTop: 40,
       alignSelf: 'center',
+    },
+    deleteAction: {
+      justifyContent: 'center',
+      alignItems: 'flex-end',
+      backgroundColor: 'transparent',
+      flex: 1,
+    },
+    deleteButton: {
+      backgroundColor: '#D7263D',
+      paddingHorizontal: 24,
+      paddingVertical: 18,
+      borderTopRightRadius: 16,
+      borderBottomRightRadius: 16,
+      marginVertical: 6,
+      marginRight: 4,
+    },
+    deleteText: {
+      color: '#fff',
+      fontWeight: 'bold',
+      fontSize: 16,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    loadingCard: {
+      backgroundColor: isDark ? '#23203a' : '#fff',
+      borderRadius: 20,
+      padding: 36,
+      alignItems: 'center',
+      shadowColor: isDark ? '#000' : '#aaa',
+      shadowOpacity: 0.10,
+      shadowOffset: { width: 0, height: 2 },
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    loadingEmoji: {
+      fontSize: 48,
+      marginBottom: 12,
+    },
+    loadingText: {
+      fontSize: 22,
+      color: isDark ? '#fff' : '#6D0080',
+      fontWeight: 'bold',
+      letterSpacing: 1.2,
+      marginBottom: 6,
+    },
+    loadingSubtext: {
+      fontSize: 15,
+      color: isDark ? '#bbb' : '#888',
+      marginTop: 2,
+    },
+    loadingSpinner: {
+      marginBottom: 10,
+    },
+    loadingOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: isDark ? '#1A1333' : '#F6F0FF',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 999,
     },
   });

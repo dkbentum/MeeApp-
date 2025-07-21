@@ -65,39 +65,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    try {
-      // First check if backend is reachable
-      const isBackendHealthy = await checkBackendHealth();
-      if (!isBackendHealthy) {
-        console.log('Backend is not reachable, using mock login');
-        // For development, create a mock user if backend is not available
-        const mockUser = { id: 1, username: email.split('@')[0], email };
-        const mockToken = 'mock-token-' + Date.now();
-        setToken(mockToken);
-        setUser(mockUser);
-        await storeAuthData(mockToken, mockUser);
-        return true;
-      }
-
-      const result = await apiCall('/api/auth/signin', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
+    // FAKE LOGIN: Accept any input and proceed
+    console.log("Login attempt with email:", email);
+    const url = "https://meeapp.onrender.com/api/auth/login";
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const { token } = data;
+      setToken(token);
+      const userUrl = "https://meeapp.onrender.com/api/users/me";
+      const userResponse = await fetch(userUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
-
-      if (result.success && result.data) {
-        const { accessToken, user: userData } = result.data;
-        setToken(accessToken);
-        setUser(userData);
-        await storeAuthData(accessToken, userData);
-        return true;
-      } else {
-        console.error('Login failed:', result.error);
-        return false;
-      }
-    } catch (error) {
-      console.error('Login error:', error);
+      const userData = await userResponse.json();
+      setUser(userData);
+      await storeAuthData(token, userData);
+      return true;
+    } else {
+      console.error('Login failed:', response.status);
       return false;
     }
+    // const mockUser = {
+    //   id: 1,
+    //   username: email.split('@')[0],
+    //   email,
+    //   roles: ['USER'],
+    // };
+    // const mockToken = 'mock-token-' + Date.now();
+    // setToken(mockToken);
+    // setUser(mockUser);
+    // await storeAuthData(mockToken, mockUser);
+    // return true;
   };
 
   const register = async (username: string, email: string, password: string): Promise<boolean> => {

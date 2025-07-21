@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, useColorScheme } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, useColorScheme, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 
 const PURPLE = '#6A0DAD';
 const LIGHT_PURPLE = '#F2E8FF';
@@ -10,12 +11,15 @@ const InterestsSection = ({ interests }) => {
   const theme = useColorScheme();
   const isDark = theme === 'dark';
   const styles = getStyles(isDark);
+  const router = useRouter();
 
   return (
     <View style={styles.section}>
       <View style={styles.header}>
         <Text style={styles.sectionTitle}>Your interests</Text>
-        <Text style={styles.link}>Edit</Text>
+        <TouchableOpacity onPress={() => router.push('/profile')}>
+          <Text style={styles.link}>Edit</Text>
+        </TouchableOpacity>
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scroll}>
         <View style={styles.tagWrap}>

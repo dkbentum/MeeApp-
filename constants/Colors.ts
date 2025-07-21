@@ -1,24 +1,28 @@
-const tintColorLight = '#2f95dc';
-const tintColorDark = '#fff';
+const lightBackground = '#F7F7FA';
+const darkBackground = '#181828';
+const lightCard = '#fff';
+const darkCard = '#23233a';
+const accent = '#222';
+const textLight = '#111';
+const textDark = '#fff';
 
 export default {
   light: {
-    text: '#000',
-    background: '#fff',
-    tint: tintColorLight,
-    tabIconDefault: '#ccc',
-    tabIconSelected: tintColorLight,
+    text: textLight,
+    background: lightBackground,
+    tint: accent,
+    tabIconDefault: '#bbb',
+    tabIconSelected: accent,
+    card: lightCard,
+    accent,
   },
   dark: {
-    text: '#fff',
-    background: '#000',
-    tint: tintColorDark,
-    tabIconDefault: '#ccc',
-    tabIconSelected: tintColorDark,
+    text: textDark,
+    background: darkBackground,
+    tint: textDark,
+    tabIconDefault: '#bbb',
+    tabIconSelected: textDark,
+    card: darkCard,
+    accent: textDark,
   },
 };
-
-//using Seashell  Thistle Periwinkle
-// use the black and its shades for DarkTheme
-// use the purple and its shades for LightTheme
-//#f0f0f0 for light mode

@@ -40,12 +40,22 @@ export default function LoginScreen() {
     setError('');
 
     try {
-      const success = await login(email, password);
-      if (success) {
-        setShowSplash(true);
-      } else {
-        setError('Login failed. Please check your credentials.');
+      const response = await fetch('https://meeapp.onrender.com/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      if (!response.ok) {
+        setError('Invalid credentials. Please try again.');
+        setLoading(false);
+        return;
       }
+      const data = await response.json();
+      // Store JWT token if returned
+      if (data.token) {
+        await AsyncStorage.setItem('token', data.token);
+      }
+      setShowSplash(true);
     } catch (err) {
       setError('An error occurred. Please try again.');
     } finally {
@@ -127,14 +137,13 @@ export default function LoginScreen() {
 
             <View style={styles.signupContainer}>
               <Text style={styles.signupText}>Don't have an account?</Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push({ pathname: '/signup' })}>
                 <Text style={styles.signupLink}>Sign Up</Text>
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Network Debug Component - Remove this in production */}
-          <NetworkDebug />
         </ScrollView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
@@ -154,8 +163,8 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   logo: {
-    width: 90,
-    height: 90,
+    width: 140,
+    height: 140,
     borderRadius: 20,
     marginBottom: 8,
   },

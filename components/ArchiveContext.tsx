@@ -1,31 +1,20 @@
 // ArchiveContext.tsx
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-type Post = {
-  message: ReactNode; id: number; title: string; body: string 
-};
+// This is just a template for context structure. The actual InterestsContext will be created in a new file.
 
 type ArchiveContextType = {
-  archivedPosts: Post[];
-  archivePost: (post: Post) => void;
-  removeFromArchive: (postId: number) => void;
+  archivedMessages: any[];
+  setArchivedMessages: React.Dispatch<React.SetStateAction<any[]>>;
 };
 
 const ArchiveContext = createContext<ArchiveContextType | undefined>(undefined);
 
-export const ArchiveProvider = ({ children }: { children: React.ReactNode }) => {
-  const [archivedPosts, setArchivedPosts] = useState<Post[]>([]);
-
-  const archivePost = (post: Post) => {
-    setArchivedPosts((prev) => [...prev, post]);
-  };
-
-  const removeFromArchive = (postId: number) => {
-    setArchivedPosts((prev) => prev.filter(post => post.id !== postId));
-  };
+export const ArchiveProvider = ({ children }: { children: ReactNode }) => {
+  const [archivedMessages, setArchivedMessages] = useState<any[]>([]);
 
   return (
-    <ArchiveContext.Provider value={{ archivedPosts, archivePost, removeFromArchive }}>
+    <ArchiveContext.Provider value={{ archivedMessages, setArchivedMessages }}>
       {children}
     </ArchiveContext.Provider>
   );

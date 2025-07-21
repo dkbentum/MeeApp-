@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,9 +8,16 @@ import {
   StyleSheet,
   Image,
   StatusBar,
+  Modal,
+  FlatList,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import ProfileHeader from '../components/ProfileHeader';
+import { useAuth } from '../components/AuthContext';
+import { useRouter } from 'expo-router';
+import { useColorScheme } from '../components/useColorScheme';
+import { useInterests } from '../components/InterestsContext';
 
 const TECH_STACK = [
   { name: 'React', icon: <FontAwesome5 name="react" size={22} color="#61DBFB" /> },
@@ -23,7 +30,7 @@ const TECH_STACK = [
 const ACHIEVEMENTS = [
   { icon: 'trophy', text: 'Won Hackathon 2024' },
   { icon: 'robot', text: 'Built a GPT-powered chatbot' },
-  { icon: 'rocket', text: 'Launched 3 side projects' },
+  { icon: 'rocket-outline', text: 'Launched 3 side projects' },
 ];
 
 const SUBTLE_PURPLE = '#4B2066';
@@ -32,15 +39,42 @@ const SUBTLE_ACCENT = '#7C4DFF';
 const SUBTLE_TEXT = '#E0D4FF';
 const SUBTLE_TAG = '#5E3A7A';
 
+const ALL_INTERESTS = [
+  'AI', 'Fitness', 'Startups','Electronics', 'Music', 'Gaming', 'Tech Talks',
+  'Design', 'Photography', 'Spirituality', 'financing','investing', 'Health', 'Entrepreneurship', 'Networking',
+  'Art', 'Writing','UI/UX', 'Product Design','robotics', 'Cooking', 'Sports', 'Science', 'Movies', 'Books','other',
+];
+
 const ProfileScreen: React.FC = () => {
-  const [name, setName] = useState('Dandelion Kwame Bentum');
-  const [email, setEmail] = useState('dandelion@example.com');
-  const [bio, setBio] = useState('Nerdy student at KNUST 🚀 | Building billion-dollar ideas 👨🏽‍💻 | Making chips & machines go brrr ⚡⚡');
-  const [interests, setInterests] = useState([
-    'AI', 'React Native', 'Gaming', 'Robotics', 'Space', 'Music', 'Hacking',
-  ]);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [bio, setBio] = useState('');
   const [newInterest, setNewInterest] = useState('');
   const [image, setImage] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [showInterestModal, setShowInterestModal] = useState(false);
+  const { logout } = useAuth();
+  const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
+  const { interests, setInterests } = useInterests();
+
+  // 🎯 Fetch dummy profile data
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch('https://jsonplaceholder.typicode.com/users/1');
+        const data = await res.json();
+        setName(data.name);
+        setEmail(data.email);
+        setBio(`Hi, I'm ${data.name}. I’m from ${data.address.city}, and I work at ${data.company.name}.`);
+      } catch (err) {
+        console.error('Failed to fetch profile data:', err);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -60,102 +94,159 @@ const ProfileScreen: React.FC = () => {
     }
   };
 
+  const handleAddInterest = (interest: string) => {
+    if (!interests.includes(interest)) {
+      setInterests([...interests, interest]);
+    }
+    setShowInterestModal(false);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/login');
+  };
+
+  const handleEdit = () => setEditMode(true);
+  const handleCancel = () => setEditMode(false);
+  const handleSave = () => {
+    // You can POST updated data to your backend here
+    setEditMode(false);
+  };
+
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Profile Picture & Name */}
-        <View style={styles.profileHeader}>
-          <View style={styles.avatarWrapper}>
-            <Image
-              source={image ? { uri: image } : require('../assets/images/p1.jpg')}
-              style={styles.avatar}
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+      {/* Top section: profile picture only */}
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee', position: 'relative' }}>
+        <View style={{ alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+          <ProfileHeader name={name} email={email} image={image} onEditAvatar={pickImage} showName={false} showEmail={false} />
+          {/* Overlay name and email on image */}
+          <View style={{ position: 'absolute', bottom: 32, left: 0, right: 0, alignItems: 'center' }}>
+            <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 20, textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 }}>{name}</Text>
+            <Text style={{ color: '#fff', fontSize: 14, textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 }}>{email}</Text>
+          </View>
+        </View>
+      </View>
+      {/* Bottom section: all details with curved top corners */}
+      <View style={{ flex: 3, backgroundColor: '#fff', borderTopLeftRadius: 32, borderTopRightRadius: 32, overflow: 'hidden', marginTop: -24 }}>
+        <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: '#fff' }}>
+          {/* About Me section */}
+          <Text style={[styles.sectionTitle, { marginTop: 0 }]}>About Me</Text>
+          <Text style={{ color: '#888', fontSize: 13, marginHorizontal: 18, marginBottom: 8 }}>
+            Introduce yourself to others on CNETWK. This can be short and simple.
+          </Text>
+          <View style={{ marginHorizontal: 18, marginBottom: 18 }}>
+            {editMode ? (
+              <View style={{ borderWidth: 1, borderColor: '#bbb', borderStyle: 'dashed', borderRadius: 10, padding: 10, minHeight: 60, justifyContent: 'center' }}>
+                <TextInput
+                  style={[styles.bioText, { backgroundColor: 'transparent', borderRadius: 8, padding: 0, color: '#222', minHeight: 40 }]}
+                  value={bio}
+                  onChangeText={setBio}
+                  multiline
+                  placeholder="Add bio"
+                  placeholderTextColor="#bbb"
+                />
+              </View>
+            ) : (
+              bio.trim() ? (
+                <View style={{ backgroundColor: '#f5f5f5', borderRadius: 12, padding: 14 }}>
+                  <Text style={[styles.bioText, { color: '#222' }]}>{bio}</Text>
+                </View>
+              ) : (
+                <View style={{ borderWidth: 1, borderColor: '#bbb', borderStyle: 'dashed', borderRadius: 10, padding: 16, alignItems: 'center', minHeight: 60, justifyContent: 'center' }}>
+                  <Text style={{ color: '#bbb', fontSize: 15 }}>Add bio</Text>
+                </View>
+              )
+            )}
+          </View>
+
+          {/* Member section: vertical list of groups only */}
+          <View style={{ backgroundColor: '#f5f5f5', borderRadius: 12, padding: 0, marginHorizontal: 18, marginBottom: 18, overflow: 'hidden' }}>
+            <Text style={{ color: '#222', fontWeight: 'bold', fontSize: 16, paddingHorizontal: 18, paddingTop: 18, paddingBottom: 4 }}>Member</Text>
+            {['React Devs', 'AI Researchers', 'Product Managers'].map((group, idx) => (
+              <View key={idx} style={{ paddingVertical: 16, paddingHorizontal: 18, borderBottomWidth: idx < 2 ? 1 : 0, borderBottomColor: '#e0e0e0' }}>
+                <Text style={{ color: '#222', fontWeight: '500', fontSize: 15 }}>{group}</Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Interests in gray card */}
+          <Text style={styles.sectionTitle}>Interests</Text>
+          <View style={{ backgroundColor: '#f5f5f5', borderRadius: 12, padding: 14, marginHorizontal: 18, marginBottom: 18, minHeight: 60, flexDirection: 'row', alignItems: 'center' }}>
+            <FlatList
+              data={interests}
+              horizontal
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <View style={[styles.interestTag, { backgroundColor: '#e0e0e0' }]}>
+                  <MaterialCommunityIcons name="star-four-points" size={14} color="#222" style={{ marginRight: 4 }} />
+                  <Text style={[styles.interestText, { color: '#222' }]}>{item}</Text>
+                </View>
+              )}
+              showsHorizontalScrollIndicator={false}
+              style={{ flex: 1 }}
             />
-            <TouchableOpacity style={styles.editAvatar} onPress={pickImage}>
-              <Ionicons name="camera" size={20} color="#fff" />
+            <TouchableOpacity style={{ marginLeft: 10, backgroundColor: '#222', borderRadius: 16, padding: 8 }} onPress={() => setShowInterestModal(true)}>
+              <Text style={{ color: '#fff', fontSize: 20, fontWeight: 'bold' }}>+</Text>
             </TouchableOpacity>
           </View>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.email}>{email}</Text>
-          <View style={styles.geekBadge}>
-            <MaterialCommunityIcons name="alien" size={16} color="#fff" />
-            <Text style={styles.geekBadgeText}>Level 7 Coder</Text>
-          </View>
-        </View>
-
-        {/* Bio Card */}
-        <View style={styles.bioCard}>
-          <Ionicons name="quote" size={20} color="#9B30FF" style={{ marginRight: 8 }} />
-          <Text style={styles.bioText}>{bio}</Text>
-        </View>
-
-        {/* Interests */}
-        <Text style={styles.sectionTitle}>Interests</Text>
-        <View style={styles.interestsWrapper}>
-          {interests.map((item, index) => (
-            <View key={index} style={styles.interestTag}>
-              <MaterialCommunityIcons name="star-four-points" size={14} color="#fff" style={{ marginRight: 4 }} />
-              <Text style={styles.interestText}>{item}</Text>
+          {/* Interests Modal */}
+          <Modal
+            visible={showInterestModal}
+            animationType="slide"
+            transparent
+            onRequestClose={() => setShowInterestModal(false)}
+          >
+            <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.25)' }}>
+              <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, minHeight: 320 }}>
+                <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 16, color: '#222' }}>Select Interests</Text>
+                <FlatList
+                  data={ALL_INTERESTS}
+                  numColumns={3}
+                  keyExtractor={(item) => item}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: interests.includes(item) ? '#222' : '#f5f5f5',
+                        borderRadius: 16,
+                        paddingHorizontal: 14,
+                        paddingVertical: 10,
+                        margin: 6,
+                      }}
+                      onPress={() => handleAddInterest(item)}
+                      disabled={interests.includes(item)}
+                    >
+                      <Text style={{ color: interests.includes(item) ? '#fff' : '#222', fontWeight: '600' }}>{item}</Text>
+                    </TouchableOpacity>
+                  )}
+                  contentContainerStyle={{ alignItems: 'flex-start' }}
+                />
+                <TouchableOpacity style={{ marginTop: 18, alignSelf: 'center' }} onPress={() => setShowInterestModal(false)}>
+                  <Text style={{ color: '#222', fontWeight: 'bold', fontSize: 16 }}>Close</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          ))}
-        </View>
-        <View style={styles.addInterest}>
-          <TextInput
-            style={styles.input}
-            value={newInterest}
-            onChangeText={setNewInterest}
-            placeholder="Add interest"
-            placeholderTextColor="#aaa"
-          />
-          <TouchableOpacity style={styles.addBtn} onPress={addInterest}>
-            <Text style={styles.addBtnText}>+</Text>
+          </Modal>
+
+          {editMode ? (
+            <View style={{ flexDirection: 'row', marginHorizontal: 18, marginBottom: 18, gap: 12 }}>
+              <TouchableOpacity style={[styles.editBtn, { flex: 1, backgroundColor: '#222' }]} onPress={handleSave}>
+                <Text style={[styles.editBtnText, { color: '#fff' }]}>Save</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.editBtn, { flex: 1, backgroundColor: '#bbb' }]} onPress={handleCancel}>
+                <Text style={[styles.editBtnText, { color: '#222' }]}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity style={[styles.editBtn, { backgroundColor: '#222' }]} onPress={handleEdit}>
+              <Text style={[styles.editBtnText, { color: '#fff' }]}>Edit Profile</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+            <Text style={[styles.logoutText, { color: '#222' }]}>Log Out</Text>
           </TouchableOpacity>
-        </View>
-
-        {/* Stats */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statBox}>
-            <Ionicons name="people" size={20} color="#fff" style={{ marginBottom: 4 }} />
-            <Text style={styles.statNumber}>2.3k</Text>
-            <Text style={styles.statLabel}>Followers</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Ionicons name="person-add" size={20} color="#fff" style={{ marginBottom: 4 }} />
-            <Text style={styles.statNumber}>180</Text>
-            <Text style={styles.statLabel}>Following</Text>
-          </View>
-        </View>
-
-        {/* Tech Stack */}
-        <Text style={styles.sectionTitle}>Tech Stack</Text>
-        <View style={styles.techStackWrapper}>
-          {TECH_STACK.map((item, idx) => (
-            <View key={idx} style={styles.techIconBox}>
-              {item.icon}
-              <Text style={styles.techName}>{item.name}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Achievements */}
-        <Text style={styles.sectionTitle}>Recent Achievements</Text>
-        <View style={styles.achievementsWrapper}>
-          {ACHIEVEMENTS.map((ach, idx) => (
-            <View key={idx} style={styles.achievementBox}>
-              <MaterialCommunityIcons name={ach.icon} size={20} color="#FFD700" style={{ marginRight: 8 }} />
-              <Text style={styles.achievementText}>{ach.text}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Edit & Logout Buttons */}
-        <TouchableOpacity style={styles.editBtn}>
-          <Text style={styles.editBtnText}>Edit Profile</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => console.log('Logging out...')}>
-          <Text style={styles.logout}>Log Out</Text>
-        </TouchableOpacity>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </View>
   );
 };
@@ -165,189 +256,136 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: SUBTLE_PURPLE,
-    paddingTop: 60,
-    paddingHorizontal: 0,
-  },
-  profileHeader: {
-    alignItems: 'center',
-    marginBottom: 18,
-  },
-  avatarWrapper: {
-    position: 'relative',
-    marginBottom: 10,
-  },
-  avatar: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    borderWidth: 3,
-    borderColor: SUBTLE_ACCENT,
-  },
-  editAvatar: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: SUBTLE_ACCENT,
-    borderRadius: 16,
-    padding: 6,
-    borderWidth: 2,
-    borderColor: SUBTLE_CARD,
-  },
-  name: {
-    color: SUBTLE_TEXT,
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 2,
-  },
-  email: {
-    color: '#B39DDB',
-    fontSize: 15,
-    marginBottom: 6,
-  },
-  geekBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: SUBTLE_TAG,
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginTop: 4,
-    marginBottom: 8,
-  },
-  geekBadgeText: {
-    color: SUBTLE_TEXT,
-    fontSize: 13,
-    marginLeft: 6,
-    fontWeight: '600',
   },
   bioCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: SUBTLE_CARD,
+    backgroundColor: '#2D1B3A',
     borderRadius: 16,
-    padding: 16,
+    padding: 14,
     marginHorizontal: 18,
-    marginBottom: 18,
+    marginTop: 18,
+    marginBottom: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
     elevation: 2,
   },
   bioText: {
-    color: SUBTLE_TEXT,
+    color: '#E0D4FF',
     fontSize: 15,
-    fontStyle: 'italic',
     flex: 1,
   },
   sectionTitle: {
-    color: SUBTLE_TEXT,
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#222',
     marginLeft: 18,
-    marginBottom: 8,
-    marginTop: 10,
+    marginTop: 18,
+    marginBottom: 6,
   },
   interestsWrapper: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginHorizontal: 18,
-    marginBottom: 10,
+    marginBottom: 8,
   },
   interestTag: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: SUBTLE_TAG,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    backgroundColor: '#5E3A7A',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     marginRight: 8,
     marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 1,
   },
   interestText: {
-    color: SUBTLE_TEXT,
-    fontWeight: '500',
-    fontSize: 14,
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
   },
   addInterest: {
     flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: 18,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   input: {
     flex: 1,
+    height: 40,
+    borderColor: '#7C4DFF',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    color: '#fff',
     backgroundColor: '#3C2952',
-    color: SUBTLE_TEXT,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    fontSize: 16,
+    marginRight: 8,
   },
   addBtn: {
-    marginLeft: 10,
-    backgroundColor: SUBTLE_ACCENT,
-    padding: 10,
-    borderRadius: 10,
+    backgroundColor: '#222',
+    borderRadius: 8,
+    padding: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   addBtnText: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: 18,
-    marginVertical: 20,
+    marginTop: 18,
+    marginBottom: 8,
   },
   statBox: {
-    backgroundColor: SUBTLE_CARD,
-    padding: 16,
-    borderRadius: 16,
-    alignItems: 'center',
     flex: 1,
-    marginHorizontal: 4,
+    backgroundColor: '#4B2066',
+    borderRadius: 14,
+    alignItems: 'center',
+    paddingVertical: 14,
+    marginHorizontal: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 2,
   },
   statNumber: {
-    color: SUBTLE_TEXT,
-    fontSize: 22,
+    color: '#FFD700',
+    fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 2,
   },
   statLabel: {
-    color: '#B39DDB',
-    fontSize: 14,
+    color: '#E0D4FF',
+    fontSize: 13,
   },
   techStackWrapper: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginHorizontal: 18,
-    marginBottom: 10,
+    marginBottom: 8,
   },
   techIconBox: {
     alignItems: 'center',
     marginRight: 18,
-    marginBottom: 10,
-    backgroundColor: SUBTLE_CARD,
-    borderRadius: 12,
+    marginBottom: 8,
+    backgroundColor: '#2D1B3A',
+    borderRadius: 10,
     padding: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 1,
+    minWidth: 70,
   },
   techName: {
-    color: SUBTLE_TEXT,
-    fontWeight: '600',
+    color: '#E0D4FF',
     fontSize: 13,
     marginTop: 4,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   achievementsWrapper: {
     marginHorizontal: 18,
@@ -356,44 +394,39 @@ const styles = StyleSheet.create({
   achievementBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: SUBTLE_CARD,
-    borderRadius: 12,
+    backgroundColor: '#3C2952',
+    borderRadius: 10,
     padding: 10,
     marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 1,
   },
   achievementText: {
-    color: SUBTLE_TEXT,
-    fontWeight: '500',
+    color: '#FFD700',
     fontSize: 14,
+    fontWeight: '600',
   },
   editBtn: {
-    backgroundColor: SUBTLE_CARD,
-    marginHorizontal: 18,
-    borderRadius: 12,
-    paddingVertical: 14,
+    backgroundColor: '#222',
+    borderRadius: 10,
+    paddingVertical: 12,
     alignItems: 'center',
-    marginBottom: 18,
-    shadowColor: SUBTLE_ACCENT,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 2,
+    marginHorizontal: 18,
+    marginTop: 18,
+    marginBottom: 8,
   },
   editBtnText: {
-    color: SUBTLE_ACCENT,
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
-  logout: {
-    color: SUBTLE_TEXT,
-    textAlign: 'center',
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 30,
+  },
+  logoutBtn: {
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 32,
+  },
+  logoutText: {
+    color: '#222',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 8,
   },
 });
