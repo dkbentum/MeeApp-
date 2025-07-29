@@ -23,14 +23,10 @@ export default function PostDetailScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: isDark ? '#1A1333' : '#F6F0FF' }]}>  
-      <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-        <Ionicons name="arrow-back" size={28} color={isDark ? '#fff' : '#6D0080'} />
-        <Text style={[styles.backText, { color: isDark ? '#fff' : '#6D0080' }]}>Back</Text>
-      </TouchableOpacity>
       <PostDetails
         visible={true}
         post={post}
-        onClose={() => router.back()}
+        onClose={() => {}}
         relatedPosts={[]}
         isDark={isDark}
       />

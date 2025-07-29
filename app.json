@@ -4,7 +4,7 @@
     "slug": "MeeApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/CNETWK.png",
     "scheme": "meeapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -21,7 +21,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.dkbentum1.MeeApp"
     },
     "web": {
       "bundler": "metro",
@@ -34,6 +35,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "50430e88-df3f-425d-a083-58c69fa068bf"
+      }
     }
   }
 }

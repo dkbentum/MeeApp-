@@ -6,6 +6,8 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 type ArchiveContextType = {
   archivedMessages: any[];
   setArchivedMessages: React.Dispatch<React.SetStateAction<any[]>>;
+  removeFromArchive: (id: number) => void;
+  archivedPosts: any[];
 };
 
 const ArchiveContext = createContext<ArchiveContextType | undefined>(undefined);
@@ -13,8 +15,12 @@ const ArchiveContext = createContext<ArchiveContextType | undefined>(undefined);
 export const ArchiveProvider = ({ children }: { children: ReactNode }) => {
   const [archivedMessages, setArchivedMessages] = useState<any[]>([]);
 
+  const removeFromArchive = (id: number) => {
+    setArchivedMessages((prev) => prev.filter((msg) => msg.id !== id));
+  };
+
   return (
-    <ArchiveContext.Provider value={{ archivedMessages, setArchivedMessages }}>
+    <ArchiveContext.Provider value={{ archivedMessages, setArchivedMessages, removeFromArchive, archivedPosts: archivedMessages }}>
       {children}
     </ArchiveContext.Provider>
   );

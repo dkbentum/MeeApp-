@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, FlatList as RNFlatList, useColorScheme } from 'react-native';
+import { useState } from 'react';
 
 export type Post = {
   id: number;
@@ -22,13 +23,21 @@ type PostDetailsProps = {
 const PostDetails: React.FC<PostDetailsProps> = ({ visible, post, onClose, relatedPosts, isDark }) => {
   if (!post) return null;
   const styles = getStyles(isDark);
+  const [isMember, setIsMember] = useState(false);
+  const [joining, setJoining] = useState(false);
+
+  const handleJoinGroup = async () => {
+    setJoining(true);
+    // Dummy API call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setIsMember(true);
+    setJoining(false);
+    alert(`You successfully joined the ${post.title} WK-event!`);
+  };
   return (
     <View style={styles.modalOverlay}>
       <View style={styles.cardBg}>
         <ScrollView style={{ width: '100%' }} contentContainerStyle={styles.content}>
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-            <Text style={styles.closeText}>×</Text>
-          </TouchableOpacity>
           {/* Post Image */}
           <Image
             source={{ uri: post.imageUrl || `https://picsum.photos/id/${post.id}/600/400` }}
@@ -61,8 +70,14 @@ const PostDetails: React.FC<PostDetailsProps> = ({ visible, post, onClose, relat
           </View>
           <View style={styles.sectionSeparator} />
           {/* Action Button */}
-          <TouchableOpacity style={styles.actionButton}>
-            <Text style={styles.actionButtonText}>Join CNET & WK</Text>
+          <TouchableOpacity
+            style={[styles.actionButton, isMember && { backgroundColor: '#aaa' }]}
+            onPress={handleJoinGroup}
+            disabled={isMember || joining}
+          >
+            <Text style={styles.actionButtonText}>
+              {isMember ? 'Joined' : (joining ? 'Joining...' : 'Join Group')}
+            </Text>
           </TouchableOpacity>
           <View style={styles.sectionSeparator} />
           {/* Related Posts */}

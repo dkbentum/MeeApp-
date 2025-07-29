@@ -21,6 +21,7 @@ import {
 import { BlurView } from 'expo-blur';
 import * as ImagePicker from 'expo-image-picker';
 import PostDetails, { Post as PostType } from '@/components/PostDetails';
+import { useRouter } from 'expo-router';
 
 // Add category and date to Post type
 export type Post = {
@@ -36,7 +37,7 @@ export type Post = {
 const { height: screenHeight } = Dimensions.get('window');
 const cardHeight = screenHeight * 0.61; // make card slightly smaller than screen
 
-const API_BASE_URL = 'https://meeapp.onrender.com';
+const API_BASE_URL = 'https://jsonplaceholder.typicode.com';
 
 const ExploreContentInfo = ({ selectedTimeTab, selectedCategory }: {
   selectedTimeTab: string;
@@ -46,14 +47,13 @@ const ExploreContentInfo = ({ selectedTimeTab, selectedCategory }: {
   const [loading, setLoading] = useState(true);
   const theme = useColorScheme();
   const isDark = theme === 'dark';
-  const [showModal, setShowModal] = useState(false);
+  const router = useRouter();
   const [newPost, setNewPost] = useState({ title: '', body: '', category: '', imageUrl: '' });
   const [submitting, setSubmitting] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<PostType | null>(null);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [activeBookmarks, setActiveBookmarks] = useState<{ [key: number]: boolean }>({});
   const [activeConnects, setActiveConnects] = useState<{ [key: number]: boolean }>({});
+  const [showModal, setShowModal] = useState(false); // Added for Create WK-Post Modal
 
   // Helper to map time tab to date string (for demo, just use today/tomorrow)
   const getDateForTab = (tab: string) => {
@@ -72,15 +72,31 @@ const ExploreContentInfo = ({ selectedTimeTab, selectedCategory }: {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      let url = `${API_BASE_URL}/api/posts`;
-      if (selectedCategory && selectedCategory !== 'All Events') {
-        url = `${API_BASE_URL}/api/posts/interest/${encodeURIComponent(selectedCategory)}`;
-      }
-      // Optionally, if you want to fetch by user, add logic here
-      // if (userId) url = `${API_BASE_URL}/api/posts/user/${userId}`;
+      let url = `${API_BASE_URL}/posts`;
+      // JSONPlaceholder does not support filtering by category or time, so fetch all and filter locally
       const res = await fetch(url);
-      const data = await res.json();
-      setPosts(data);
+      let data = await res.json();
+      // Add dummy fields for imageUrl, category, date, userId
+      data = data.slice(0, 20).map((item: any, idx: number) => ({
+        ...item,
+        imageUrl: `https://picsum.photos/id/${idx + 10}/600/400`,
+        category: ['Social', 'Tech Talks', 'Music', 'Games', 'Workshops'][idx % 5],
+        date: new Date(Date.now() + idx * 86400000).toISOString().slice(0, 10),
+        userId: item.userId || 1,
+      }));
+      // Optionally filter by selectedCategory or selectedTimeTab
+      let filtered = data;
+      if (selectedCategory && selectedCategory !== 'All Events') {
+        filtered = filtered.filter((item: any) => item.category === selectedCategory);
+      }
+      if (selectedTimeTab === 'Today') {
+        const today = new Date().toISOString().slice(0, 10);
+        filtered = filtered.filter((item: any) => item.date === today);
+      } else if (selectedTimeTab === 'Tomorrow') {
+        const tmr = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+        filtered = filtered.filter((item: any) => item.date === tmr);
+      }
+      setPosts(filtered);
     } catch (err) {
       console.error('Failed to fetch posts:', err);
       setPosts([]);
@@ -92,7 +108,8 @@ const ExploreContentInfo = ({ selectedTimeTab, selectedCategory }: {
   const handleCreatePost = async () => {
     setSubmitting(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/posts`, {
+      // Simulate a successful post creation (JSONPlaceholder will return a fake response)
+      const res = await fetch(`${API_BASE_URL}/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -101,13 +118,22 @@ const ExploreContentInfo = ({ selectedTimeTab, selectedCategory }: {
           category: newPost.category || selectedCategory,
           imageUrl: newPost.imageUrl,
           date: new Date().toISOString().slice(0, 10),
-          // authorId: 1 // Optionally add user id if available
+          userId: 1,
         })
       });
-      if (!res.ok) throw new Error('Failed to create post');
-      setShowModal(false);
+      // Add the new post locally for UI feedback
+      const fakePost = {
+        id: Math.floor(Math.random() * 100000),
+        title: newPost.title,
+        body: newPost.body,
+        category: newPost.category || selectedCategory,
+        imageUrl: newPost.imageUrl || `https://picsum.photos/id/${Math.floor(Math.random()*100)}/600/400`,
+        date: new Date().toISOString().slice(0, 10),
+        userId: 1,
+      };
+      setPosts([fakePost, ...posts]);
+      // setShowModal(false); // Removed
       setNewPost({ title: '', body: '', category: '', imageUrl: '' });
-      fetchPosts();
     } catch (err) {
       alert('Failed to create post.');
     } finally {
@@ -148,8 +174,19 @@ const ExploreContentInfo = ({ selectedTimeTab, selectedCategory }: {
   // };
 
   const handlePressPost = (post: PostType) => {
-    setSelectedPost(post);
-    setShowDetailsModal(true);
+    // Navigate to PostDetailScreen with all post fields as params
+    router.push({
+      pathname: '/PostDetailScreen',
+      params: {
+        id: post.id.toString(),
+        title: post.title,
+        body: post.body,
+        imageUrl: post.imageUrl || '',
+        category: post.category || '',
+        date: post.date || '',
+        userId: post.userId ? post.userId.toString() : '',
+      },
+    });
   };
 
   const handleToggleBookmark = (postId: number) => {
@@ -248,52 +285,56 @@ const ExploreContentInfo = ({ selectedTimeTab, selectedCategory }: {
       <Modal
         visible={showModal}
         animationType="slide"
-        transparent
+        transparent={true}
         onRequestClose={() => setShowModal(false)}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Create WK-Post</Text>
+            <Text style={styles.modalTitle}>Create New Post</Text>
             <TextInput
               style={styles.modalInput}
               placeholder="Title"
               value={newPost.title}
-              onChangeText={t => setNewPost({ ...newPost, title: t })}
-            />
-            <TextInput
-              style={[styles.modalInput, { height: 80 }]}
-              placeholder="Body"
-              value={newPost.body}
-              onChangeText={t => setNewPost({ ...newPost, body: t })}
-              multiline
+              onChangeText={(text) => setNewPost({ ...newPost, title: text })}
             />
             <TextInput
               style={styles.modalInput}
-              placeholder="Category (optional)"
-              value={newPost.category}
-              onChangeText={t => setNewPost({ ...newPost, category: t })}
+              placeholder="Body"
+              value={newPost.body}
+              onChangeText={(text) => setNewPost({ ...newPost, body: text })}
             />
-            {/* <TouchableOpacity style={styles.uploadBtn} onPress={handlePickImage} disabled={imageUploading}>
-              <Text style={styles.uploadBtnText}>{imageUploading ? 'Uploading...' : (newPost.imageUrl ? 'Change Image' : 'Upload Image')}</Text>
-            </TouchableOpacity> */}
-            {newPost.imageUrl ? (
-              <Image source={{ uri: newPost.imageUrl }} style={{ width: '100%', height: 120, borderRadius: 8, marginBottom: 10 }} />
-            ) : null}
-            <View style={styles.modalBtnRow}>
-              <Button title="Cancel" color="#888" onPress={() => setShowModal(false)} />
-              <Button title={submitting ? 'Posting...' : 'Post'} onPress={handleCreatePost} disabled={submitting} />
-            </View>
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Category (e.g., Social, Tech Talks)"
+              value={newPost.category}
+              onChangeText={(text) => setNewPost({ ...newPost, category: text })}
+            />
+            <TouchableOpacity
+              style={styles.uploadBtn}
+              onPress={() => {
+                // handlePickImage(); // Uncomment if image upload is implemented
+                handleCreatePost();
+              }}
+              disabled={submitting || imageUploading}
+            >
+              {submitting || imageUploading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.uploadBtnText}>Create Post</Text>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.uploadBtn}
+              onPress={() => setShowModal(false)}
+              disabled={submitting || imageUploading}
+            >
+              <Text style={styles.uploadBtnText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
       {/* Post Details Modal */}
-      <PostDetails
-        visible={showDetailsModal}
-        post={selectedPost}
-        onClose={() => setShowDetailsModal(false)}
-        relatedPosts={selectedPost ? posts.filter(p => (p.userId === selectedPost.userId && p.id !== selectedPost.id) || p.title.includes('React')) : []}
-        isDark={isDark}
-      />
+      {/* Removed Post Details Modal */}
     </>
   );
 };

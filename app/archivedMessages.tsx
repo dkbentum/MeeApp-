@@ -8,7 +8,7 @@ import { useArchive } from '@/components/ArchiveContext';
 import { useColorScheme } from '@/components/useColorScheme';
 
 export default function ArchivedMessagesScreen() {
-  const { archivedPosts, removeFromArchive } = useArchive();
+  const { archivedMessages, removeFromArchive } = useArchive();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const styles = getStyles(isDark);
@@ -67,7 +67,7 @@ export default function ArchivedMessagesScreen() {
         headerTintColor: isDark ? '#FFFFFF' : '#1A1A1A',
       }} />
 
-      {archivedPosts.length === 0 ? (
+      {archivedMessages.length === 0 ? (
         <View style={styles.emptyState}>
           <Ionicons 
             name="archive-outline" 
@@ -83,11 +83,11 @@ export default function ArchivedMessagesScreen() {
         <>
           <View style={styles.header}>
             <Text style={styles.headerTitle}>Archived Messages</Text>
-            <Text style={styles.messageCount}>{archivedPosts.length} archived</Text>
+            <Text style={styles.messageCount}>{archivedMessages.length} archived</Text>
           </View>
           
           <FlatList
-            data={archivedPosts}
+            data={archivedMessages}
             keyExtractor={(item) => item.id.toString()}
             renderItem={renderArchivedMessage}
             contentContainerStyle={styles.listContent}
